@@ -2,20 +2,20 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.flipkart.zjsonpatch</groupId>
+    <groupId>org.zalando.zjsonpatch</groupId>
     <artifactId>zjsonpatch</artifactId>
-    <version>0.2.4-SNAPSHOT</version>
+    <version>0.3.0</version>
     <packaging>jar</packaging>
 
     <name>zjsonpatch</name>
     <description>Java Library to find / apply JSON Patches according to RFC 6902</description>
-    <url>https://github.com/flipkart-incubator/zjsonpatch/</url>
+    <url>https://github.com/tkrop/zjsonpatch/</url>
 
     <scm>
-        <connection>scm:git:https://github.com/flipkart-incubator/zjsonpatch.git</connection>
-        <developerConnection>scm:git:https://github.com/flipkart-incubator/zjsonpatch.git</developerConnection>
+        <connection>scm:git:https://github.com/tkrop/zjsonpatch.git</connection>
+        <developerConnection>scm:git:https://github.com/tkrop/zjsonpatch.git</developerConnection>
         <tag>HEAD</tag>
-        <url>https://github.com/flipkart-incubator/zjsonpatch</url>
+        <url>https://github.com/tkrop/zjsonpatch</url>
     </scm>
 
     <developers>
