@@ -81,8 +81,7 @@
         "first": [ "hello", "world" ],
         "second": [ "hello", "world!" ],
         "patch": [
-            { "op": "add", "path": "/1", "value": "world!" },
-            { "op": "remove", "path": "/2" }
+            { "op": "replace", "path": "/1", "value": "world!" }
         ]
     },
     {
@@ -162,5 +161,34 @@
             { "op": "move", "path":"/b/1", "from": "/b/5" },
             { "op": "move", "path": "/c", "from": "/b/4" }
         ]
+    },
+    {
+        "message": "cover lots of things example",
+        "first": { "a": [ { "a" : 0 }, { "c": 1 }, { "f": 3 }, { "g": 4, "h": { "j": 6 } } ] },
+        "second": { "a": [ { "c": 1, "d": { "e": 2 } }, { "f": 3 }, { "g": 4, "h": { "i": 5, "j": 6 } }, { "k": 7 } ], "l": 8 },
+        "patch": [
+            { "op": "remove", "path": "/a/0/a" },
+            { "op": "add", "path": "/a/0/c", "value": 1 },
+            { "op": "add", "path":"/a/0/d", "value": { "e": 2 } },
+            { "op": "remove", "path":"/a/1" },
+            { "op": "add", "path": "/a/2/h/i", "value": 5 },
+            { "op": "add", "path": "/a/3", "value": { "k": 7 } },
+            { "op": "add", "path": "/l", "value":8 }
+        ]
+    },
+    {
+        "message": "cover lots of things example",
+        "first": { "a": [ { "a" : 0 }, { "c": 1 }, { "f": 3 }, { "g": 4, "h": { "j": 6 } } ] },
+        "second": { "a": [ { "c": 1, "d": { "e": 2 } }, { "f": 3 }, { "g": 4, "h": { "i": 5, "j": 6 } }, { "k": 7 } ], "l": 8 },
+        "patch": [
+            { "op": "remove", "path": "/a/0/a" },
+            { "op": "add", "path": "/a/0/c", "value": 1 },
+            { "op": "add", "path":"/a/0/d", "value":{ "e": 2 } },
+            { "op": "remove", "path": "/a/1" },
+            { "op": "add", "path": "/a/2/h/i", "value": 5 },
+            { "op": "add", "path": "/a/3", "value": { "k": 7 } },
+            { "op": "add", "path": "/l", "value": 8 }
+        ],
+        "flags": [ "ENABLE_FAST_PATCH_GENERATOR" ]
     }
 ]

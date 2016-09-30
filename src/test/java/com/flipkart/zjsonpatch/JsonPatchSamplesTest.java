@@ -8,14 +8,14 @@ import org.junit.runners.Parameterized;
 /**
  * JSON Patch test.
  */
-public class JsonPatchTest extends AbstractPatchTest {
+public class JsonPatchSamplesTest extends AbstractPatchTest {
 
-    public JsonPatchTest() {
+    public JsonPatchSamplesTest() {
         super(false);
     }
 
     @Parameterized.Parameters(name = "{index}: {0}")
     public static Collection<TestCase> data() throws IOException {
-        return TestCase.load("patch");
+        return TestCase.load("patch-samples");
     }
 }

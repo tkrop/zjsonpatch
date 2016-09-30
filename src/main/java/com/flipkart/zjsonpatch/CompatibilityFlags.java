@@ -19,9 +19,24 @@ public enum CompatibilityFlags {
     /**
      * Disable optimization of patch creation.
      */
-    DISABLE_PATCH_OPTIMIZATION;
+    DISABLE_PATCH_OPTIMIZATION,
+
+    /**
+     * Enable fast patch generator.
+     */
+    ENABLE_FAST_PATCH_GENERATOR,
+
+    /**
+     * Enable optimized patch generator.
+     */
+    ENABLE_OPT_PATCH_GENERATOR,
+
+    /**
+     * Enable original patch generator.
+     */
+    ENABLE_ORIG_PATCH_GENERATOR;
 
     public static EnumSet<CompatibilityFlags> defaults() {
-        return EnumSet.noneOf(CompatibilityFlags.class);
+        return EnumSet.of(ENABLE_OPT_PATCH_GENERATOR);
     }
 }

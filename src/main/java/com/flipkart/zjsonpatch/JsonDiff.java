@@ -21,16 +21,24 @@ public final class JsonDiff {
     }
 
     public static JsonNode asJson(final JsonNode source, final JsonNode target, final Set<CompatibilityFlags> flags) {
-        List<Diff> diffs = DiffHelper.create(source, target);
+        List<Diff> diffs = createJsonPatchGenerator(flags).create(source, target);
 
-        /**
-         * Merging remove & add to move operation
-         */
         if (!flags.contains(CompatibilityFlags.DISABLE_PATCH_OPTIMIZATION)) {
-            CompactHelper.compact(diffs);
+            new CompactHelper(flags).compact(diffs);
         }
 
         return getJsonNodes(diffs, flags);
+    }
+
+    private static JsonPatchGenerator createJsonPatchGenerator(final Set<CompatibilityFlags> flags) {
+        if (flags.contains(CompatibilityFlags.ENABLE_FAST_PATCH_GENERATOR)) {
+            return new JsonPatchFastGenerator(flags);
+        } else if (flags.contains(CompatibilityFlags.ENABLE_OPT_PATCH_GENERATOR)) {
+            return new JsonPatchOptGenerator(flags);
+        } else if (flags.contains(CompatibilityFlags.ENABLE_ORIG_PATCH_GENERATOR)) {
+            return new JsonPatchOrigGenerator(flags);
+        }
+        throw new JsonPatchApplicationException("no patch generator enabled");
     }
 
     private static ArrayNode getJsonNodes(List<Diff> diffs, Set<CompatibilityFlags> flags) {
@@ -43,12 +51,12 @@ public final class JsonDiff {
     }
 
     private static JsonNode getJsonNode(ObjectNode node, Diff diff, Set<CompatibilityFlags> flags) {
-        node.put(Constants.OP, diff.getOperation().getName());
+        node.put(Constants.OP, diff.getOp().getName());
         node.put(Constants.PATH, JsonPathHelper.getPathRep(diff.getPath()));
-        if (Operation.MOVE.equals(diff.getOperation())) {
+        if (Operation.MOVE.equals(diff.getOp())) {
             node.put(Constants.FROM, JsonPathHelper.getPathRep(diff.getPath())); // required {from} only in case of Move Operation
             node.put(Constants.PATH, JsonPathHelper.getPathRep(diff.getToPath())); // destination Path
-        } else if (!Operation.REMOVE.equals(diff.getOperation())) { // setting only for Non-Remove operation
+        } else if (!Operation.REMOVE.equals(diff.getOp())) { // setting only for Non-Remove operation
             if (!diff.getValue().isNull() || !flags.contains(CompatibilityFlags.MISSING_VALUES_AS_NULLS)) {
                 node.set(Constants.VALUE, diff.getValue());
             }
