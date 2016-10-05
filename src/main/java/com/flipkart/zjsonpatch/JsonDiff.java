@@ -31,7 +31,9 @@ public final class JsonDiff {
     }
 
     private static JsonPatchGenerator createJsonPatchGenerator(final Set<CompatibilityFlags> flags) {
-        if (flags.contains(CompatibilityFlags.ENABLE_FAST_PATCH_GENERATOR)) {
+        if (flags.contains(CompatibilityFlags.ENABLE_SAME_PATCH_GENERATOR)) {
+            return new JsonPatchSameGenerator(flags);
+        } else if (flags.contains(CompatibilityFlags.ENABLE_FAST_PATCH_GENERATOR)) {
             return new JsonPatchFastGenerator(flags);
         } else if (flags.contains(CompatibilityFlags.ENABLE_OPT_PATCH_GENERATOR)) {
             return new JsonPatchOptGenerator(flags);

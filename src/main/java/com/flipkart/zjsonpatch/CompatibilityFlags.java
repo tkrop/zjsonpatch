@@ -34,9 +34,14 @@ public enum CompatibilityFlags {
     /**
      * Enable original patch generator.
      */
-    ENABLE_ORIG_PATCH_GENERATOR;
+    ENABLE_ORIG_PATCH_GENERATOR,
+
+    /**
+     * Enable same patch generator.
+     */
+    ENABLE_SAME_PATCH_GENERATOR;
 
     public static EnumSet<CompatibilityFlags> defaults() {
-        return EnumSet.of(ENABLE_OPT_PATCH_GENERATOR);
+        return EnumSet.of(ENABLE_FAST_PATCH_GENERATOR);
     }
 }

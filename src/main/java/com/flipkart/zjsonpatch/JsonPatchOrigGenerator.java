@@ -1,5 +1,6 @@
 package com.flipkart.zjsonpatch;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -14,7 +15,11 @@ final class JsonPatchOrigGenerator extends JsonPatchGenerator {
     }
 
     @Override
-    protected void compareArrayLcs(List<Diff> diffs, List<Object> path, List<JsonNode> source,
+    protected void compareArray(List<Diff> diffs, List<Object> path, JsonNode source, JsonNode target) {
+        compareArrayLcs(diffs, path, newArrayList(source), newArrayList(target), 0);
+    }
+
+    private void compareArrayLcs(List<Diff> diffs, List<Object> path, List<JsonNode> source,
             List<JsonNode> target, int start) {
         List<JsonNode> lcs = ListUtils.longestCommonSubsequence(source, target);
         int lsize = lcs.size(), ssize = source.size(), tsize = target.size();
@@ -82,5 +87,13 @@ final class JsonPatchOrigGenerator extends JsonPatchGenerator {
             tindex++;
         }
         return pos;
+    }
+
+    private List<JsonNode> newArrayList(JsonNode node) {
+        List<JsonNode> list = new ArrayList<JsonNode>();
+        for (JsonNode elem : node) {
+            list.add(elem);
+        }
+        return list;
     }
 }

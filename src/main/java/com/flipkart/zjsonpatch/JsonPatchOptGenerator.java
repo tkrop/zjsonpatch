@@ -7,7 +7,7 @@ import org.apache.commons.collections4.ListUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-final class JsonPatchOptGenerator extends JsonPatchGenerator {
+final class JsonPatchOptGenerator extends JsonPatchLcsGenerator {
 
     public JsonPatchOptGenerator(Set<CompatibilityFlags> flags) {
         super(flags);

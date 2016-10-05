@@ -3,9 +3,9 @@ package com.flipkart.zjsonpatch;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 
-import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * User: gopi.vishwakarma Date: 31/07/14
@@ -28,7 +28,7 @@ public final class JsonPatch {
         return (child == null) ? defaultValue : child;
     }
 
-    private static JsonNode getPatchAttr(JsonNode node, EnumSet<CompatibilityFlags> flags) {
+    private static JsonNode getPatchAttr(JsonNode node, Set<CompatibilityFlags> flags) {
         if (!flags.contains(CompatibilityFlags.MISSING_VALUES_AS_NULLS)) {
             return getPatchAttr(node, Constants.VALUE);
         } else {
@@ -36,7 +36,7 @@ public final class JsonPatch {
         }
     }
 
-    private static void process(JsonNode patch, JsonPatchProcessor processor, EnumSet<CompatibilityFlags> flags)
+    private static void process(JsonNode patch, JsonPatchProcessor processor, Set<CompatibilityFlags> flags)
             throws InvalidJsonPatchException {
 
         if (!patch.isArray()) {
@@ -90,7 +90,7 @@ public final class JsonPatch {
         }
     }
 
-    public static void validate(JsonNode patch, EnumSet<CompatibilityFlags> flags) throws InvalidJsonPatchException {
+    public static void validate(JsonNode patch, Set<CompatibilityFlags> flags) throws InvalidJsonPatchException {
         process(patch, NoopProcessor.INSTANCE, flags);
     }
 
@@ -98,7 +98,7 @@ public final class JsonPatch {
         validate(patch, CompatibilityFlags.defaults());
     }
 
-    public static JsonNode apply(JsonNode patch, JsonNode source, EnumSet<CompatibilityFlags> flags)
+    public static JsonNode apply(JsonNode patch, JsonNode source, Set<CompatibilityFlags> flags)
             throws JsonPatchApplicationException {
         ApplyProcessor processor = new ApplyProcessor(
                 flags.contains(CompatibilityFlags.ENABLE_PATCH_IN_PLACE) ? source : source.deepCopy());

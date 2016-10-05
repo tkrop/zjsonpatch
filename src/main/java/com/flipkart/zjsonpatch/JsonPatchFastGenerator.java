@@ -11,7 +11,7 @@ import org.apache.commons.collections4.sequence.SequencesComparator;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-final class JsonPatchFastGenerator extends JsonPatchGenerator {
+final class JsonPatchFastGenerator extends JsonPatchLcsGenerator {
 
     public JsonPatchFastGenerator(Set<CompatibilityFlags> flags) {
         super(flags);
@@ -27,51 +27,75 @@ final class JsonPatchFastGenerator extends JsonPatchGenerator {
         visitor.visitEndCommand();
     }
 
+
     private static final class LcsDiffVisitor implements CommandVisitor<JsonNode> {
 
-        private final JsonPatchGenerator gen;
-        private final Deque<Diff> sources;
-        private final Deque<Diff> targets;
+        private final JsonPatchLcsGenerator gen;
+        private final Deque<Diff> deque;
         private final List<Diff> diffs;
         private final List<Object> path;
-        private int pos;
+        private Operation op = null;
+        private int pos, seq = 0;
 
-        public LcsDiffVisitor(JsonPatchGenerator gen, List<Diff> diffs, List<Object> path, int start) {
+        public LcsDiffVisitor(JsonPatchLcsGenerator gen, List<Diff> diffs, List<Object> path, int start) {
             this.gen = gen;
-            this.targets = new ArrayDeque<Diff>();
-            this.sources = new ArrayDeque<Diff>();
             this.diffs = diffs;
+            this.deque = new ArrayDeque<Diff>();
             this.path = path;
             this.pos = start;
         }
 
+        private void queue(Operation op, List<Object> path, JsonNode node) {
+            deque.add(new Diff(op, path, node));
+            this.op = op;
+            seq++;
+        }
+
+        private void generate(List<Object> path, JsonNode source, JsonNode target) {
+            gen.generateAll(diffs, path, source, target);
+            if (--seq == 0) {
+                op = null;
+            }
+        }
+
         @Override
         public void visitInsertCommand(JsonNode node) {
-            List<Object> currPath = JsonPathHelper.getPathExt(path, pos);
-            targets.offer(new Diff(Operation.ADD, currPath, node));
+            List<Object> path = JsonPathHelper.getPathExt(this.path, pos);
+            if (op != Operation.REMOVE) {
+                queue(Operation.ADD, path, node);
+            } else {
+                Diff diff = deque.remove();
+                generate(path, diff.getValue(), node);
+            }
             pos++;
         }
 
         @Override
         public void visitKeepCommand(JsonNode node) {
-            this.visitEndCommand();
+            clear();
             pos++;
         }
 
         @Override
         public void visitDeleteCommand(JsonNode node) {
-            List<Object> currPath = JsonPathHelper.getPathExt(path, pos);
-            sources.offer(new Diff(Operation.REMOVE, currPath, node));
+            if (op != Operation.ADD) {
+                List<Object> path = JsonPathHelper.getPathExt(this.path, pos);
+                queue(Operation.REMOVE, path, node);
+            } else {
+                Diff diff = deque.remove();
+                generate(diff.getPath(), node, diff.getValue());
+            }
         }
 
         public void visitEndCommand() {
-            while (!sources.isEmpty() && !targets.isEmpty()) {
-                Diff target = targets.poll(), source = sources.poll();
-                gen.generate(diffs, target.getPath(), source.getValue(), target.getValue());
-            }
-            diffs.addAll(targets);
-            diffs.addAll(sources);
-            sources.clear();
+            clear();
+        }
+
+        private void clear() {
+            diffs.addAll(deque);
+            deque.clear();
+            op = null;
+            seq = 0;
         }
     }
 }
