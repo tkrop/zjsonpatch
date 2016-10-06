@@ -33,8 +33,9 @@ public class JsonPatchBenchmark {
     private static final int LOOPS = 40;
     private static final Set<CompatibilityFlags> FLAGS = //
             EnumSet.of(CompatibilityFlags.ENABLE_ORIG_PATCH_GENERATOR);
+
     @SuppressWarnings("unchecked")
-    private static final Set<CompatibilityFlags>[] FLAGS_SET = (Set<CompatibilityFlags>[]) new Set[] {
+    private static final Set<CompatibilityFlags>[] FLAGS_SET = new Set[] {
             EnumSet.of(CompatibilityFlags.ENABLE_ORIG_PATCH_GENERATOR),
             EnumSet.of(CompatibilityFlags.ENABLE_OPT_PATCH_GENERATOR),
             EnumSet.of(CompatibilityFlags.ENABLE_OPT_PATCH_GENERATOR, CompatibilityFlags.DISABLE_PATCH_OPTIMIZATION),

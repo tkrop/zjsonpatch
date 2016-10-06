@@ -1,6 +1,7 @@
 package com.flipkart.zjsonpatch;
 
 import java.util.EnumSet;
+import java.util.Set;
 
 /**
  * Created by tomerga on 04/09/2016.
@@ -41,7 +42,7 @@ public enum CompatibilityFlags {
      */
     ENABLE_SAME_PATCH_GENERATOR;
 
-    public static EnumSet<CompatibilityFlags> defaults() {
+    public static Set<CompatibilityFlags> defaults() {
         return EnumSet.of(ENABLE_FAST_PATCH_GENERATOR);
     }
 }

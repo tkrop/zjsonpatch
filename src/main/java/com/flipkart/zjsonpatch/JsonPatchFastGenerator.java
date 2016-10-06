@@ -35,7 +35,7 @@ final class JsonPatchFastGenerator extends JsonPatchLcsGenerator {
         private final List<Diff> diffs;
         private final List<Object> path;
         private Operation op = null;
-        private int pos, seq = 0;
+        private int pos;
 
         public LcsDiffVisitor(JsonPatchLcsGenerator gen, List<Diff> diffs, List<Object> path, int start) {
             this.gen = gen;
@@ -48,12 +48,11 @@ final class JsonPatchFastGenerator extends JsonPatchLcsGenerator {
         private void queue(Operation op, List<Object> path, JsonNode node) {
             deque.add(new Diff(op, path, node));
             this.op = op;
-            seq++;
         }
 
         private void generate(List<Object> path, JsonNode source, JsonNode target) {
             gen.generateAll(diffs, path, source, target);
-            if (--seq == 0) {
+            if (deque.isEmpty()) {
                 op = null;
             }
         }
@@ -95,7 +94,6 @@ final class JsonPatchFastGenerator extends JsonPatchLcsGenerator {
             diffs.addAll(deque);
             deque.clear();
             op = null;
-            seq = 0;
         }
     }
 }
