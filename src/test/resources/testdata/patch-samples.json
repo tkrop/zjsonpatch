@@ -11,26 +11,26 @@
     {
         "message": "error for patch list not an array",
         "patch": { },
-        "error": "com.flipkart.zjsonpatch.InvalidJsonPatchException: invalid patch (root not an array)"
+        "error": "JsonPatchException: invalid patch (root not an array)"
     },
     {
         "message": "error for patch not an object",
         "patch": [ [ ] ],
-        "error": "com.flipkart.zjsonpatch.InvalidJsonPatchException: invalid patch (patch not an object - index: 0)"
+        "error": "JsonPatchException: invalid patch (patch not an object - index: 0)"
     },
     {
         "message": "error for unsupported null operation",
         "patch": [
             { "op": null }
         ],
-        "error": "com.flipkart.zjsonpatch.InvalidJsonPatchException: invalid patch (unsupported operation: null)"
+        "error": "JsonPatchException: [null] invalid patch (unsupported operation: null)"
     },
     {
         "message": "error for unsupported any operation",
         "patch": [
             { "op": "any" }
         ],
-        "error": "com.flipkart.zjsonpatch.InvalidJsonPatchException: invalid patch (unsupported operation: any)"
+        "error": "JsonPatchException: [any] invalid patch (unsupported operation: any)"
     },
 
     "**** test operations ****",
@@ -40,7 +40,7 @@
         "patch": [
             { "op": "test", "path": "/a", "value": { } }
         ],
-        "error": "com.flipkart.zjsonpatch.JsonPatchApplicationException: [test] no such path in source (path: /a)"
+        "error": "JsonPatchException: [test] no such path in source (path: /a)"
     },
     {
         "message": "test operation error for value differs from expectation",
@@ -48,7 +48,7 @@
         "patch": [
             { "op": "test", "path": "/a", "value": [ ] }
         ],
-        "error": "com.flipkart.zjsonpatch.JsonPatchApplicationException: [test] value differs from expectations (path: /a | value: [] | node: {})"
+        "error": "JsonPatchException: [test] value differs from expectations (path: /a | value: [] | node: {})"
     },
     {
         "message": "test operation success",
@@ -66,7 +66,7 @@
         "patch": [
             { "op": "add", "path": "/a" }
         ],
-        "error": "com.flipkart.zjsonpatch.InvalidJsonPatchException: invalid patch (missing field: value)"
+        "error": "JsonPatchException: [add] invalid patch (missing field: value)"
     },
     {
         "message": "add operation error for no such from path",
@@ -74,7 +74,7 @@
         "patch": [
             { "op": "add", "path": "/a/b", "value": "c" }
         ],
-        "error": "com.flipkart.zjsonpatch.JsonPatchApplicationException: [add] no such path in source (path: /a/b)"
+        "error": "JsonPatchException: [add] no such path in source (path: /a/b)"
     },
     {
         "message": "add operation error for no such from path",
@@ -82,7 +82,7 @@
         "patch": [
             { "op": "add", "path": "/0/b", "value": "c" }
         ],
-        "error": "com.flipkart.zjsonpatch.JsonPatchApplicationException: [add] no such path in source (path: /0/b)"
+        "error": "JsonPatchException: [add] no such path in source (path: /0/b)"
     },
     {
         "message": "add operation error for no such path",
@@ -90,7 +90,7 @@
         "patch": [
             { "op": "add", "path": "/a/b/c", "value": 1 }
         ],
-        "error": "com.flipkart.zjsonpatch.JsonPatchApplicationException: [add] parent is not a container in source (path: /a/b/c | node: \"b\")"
+        "error": "JsonPatchException: [add] parent is not a container in source (path: /a/b/c | node: \"b\")"
     },
     {
         "message": "add operation error for not an index",
@@ -106,7 +106,7 @@
         "patch": [
             { "op": "add", "path": "/3", "value": 1 }
         ],
-        "error": "com.flipkart.zjsonpatch.JsonPatchApplicationException: index out of bounds (path: /3 | index: 3 | bounds: 0-2)"
+        "error": "JsonPatchException: [add] index out of bounds (path: /3 | index: 3 | bounds: 0-2)"
     },
     {
         "message": "add operation error for negative index out of bounds",
@@ -114,7 +114,7 @@
         "patch": [
             { "op": "add", "path": "/-2", "value": 1 }
         ],
-        "error": "com.flipkart.zjsonpatch.JsonPatchApplicationException: index out of bounds (path: /-2 | index: -2 | bounds: 0-2)"
+        "error": "JsonPatchException: [add] index out of bounds (path: /-2 | index: -2 | bounds: 0-2)"
     },
     {
         "message": "add operation error for parent not container",
@@ -122,7 +122,7 @@
         "patch": [
             { "op": "add", "path": "/a/f", "value": "b" }
         ],
-        "error": "com.flipkart.zjsonpatch.JsonPatchApplicationException: [add] parent is not a container in source (path: /a/f | node: \"b\")"
+        "error": "JsonPatchException: [add] parent is not a container in source (path: /a/f | node: \"b\")"
     },
     {
         "message": "add to replace object value with null",
@@ -138,6 +138,14 @@
         "second": { },
         "patch": [
             { "op": "add", "path": "", "value": { } }
+        ]
+    },
+    {
+        "message": "add empty property to object",
+        "first": {},
+        "second": { "": "a" },
+        "patch": [
+            { "op": "add", "path": "/", "value": "a" }
         ]
     },
     {
@@ -183,7 +191,7 @@
         "patch": [
             { "op": "remove", "path": "/x/1" }
         ],
-        "error": "com.flipkart.zjsonpatch.JsonPatchApplicationException: [remove] no such path in source (path: /x/1)"
+        "error": "JsonPatchException: [remove] no such path in source (path: /x/1)"
     },
     {
         "message": "remove operation error for no such from path",
@@ -191,7 +199,7 @@
         "patch": [
             { "op": "remove", "path": "/a/b" }
         ],
-        "error": "com.flipkart.zjsonpatch.JsonPatchApplicationException: [remove] no such path in source (path: /a/b)"
+        "error": "JsonPatchException: [remove] no such path in source (path: /a/b)"
     },
     {
         "message": "remove operation error for no such path in array",
@@ -199,7 +207,7 @@
         "patch": [
             { "op": "remove", "path": "/x/1" }
         ],
-        "error": "com.flipkart.zjsonpatch.JsonPatchApplicationException: index out of bounds (path: /x/1 | index: 1 | bounds: 0-0)"
+        "error": "JsonPatchException: [remove] index out of bounds (path: /x/1 | index: 1 | bounds: 0-0)"
     },
     {
         "message": "remove operation error for no such path",
@@ -268,7 +276,7 @@
         "patch": [
             { "op": "move", "path": "/a/b", "from": "/a" }
         ],
-        "error": "com.flipkart.zjsonpatch.JsonPatchApplicationException: [add] no such path in source (path: /a/b)"
+        "error": "JsonPatchException: [move] no such path in source (path: /a/b)"
     },
     {
         "message": "move operation error for no such parent",
@@ -276,7 +284,7 @@
         "patch": [
             { "op": "move", "path": "/b/c", "from": "/a" }
         ],
-        "error": "com.flipkart.zjsonpatch.JsonPatchApplicationException: [add] no such path in source (path: /b/c)"
+        "error": "JsonPatchException: [move] no such path in source (path: /b/c)"
     },
     {
         "message": "move operation error for missing from field",
@@ -284,7 +292,7 @@
         "patch": [
             { "op": "move", "path": "/b/c" }
         ],
-        "error": "com.flipkart.zjsonpatch.InvalidJsonPatchException: invalid patch (missing field: from)"
+        "error": "JsonPatchException: [move] invalid patch (missing field: from)"
     },
     {
         "message": "move operation error for no such from path",
@@ -292,7 +300,7 @@
         "patch": [
             { "op": "move", "path": "/a/b", "from": "/a" }
         ],
-        "error": "com.flipkart.zjsonpatch.JsonPatchApplicationException: [add] no such path in source (path: /a/b)"
+        "error": "JsonPatchException: [move] no such path in source (path: /a/b)"
     },
     {
         "message": "move operation error for no such parent",
@@ -300,7 +308,7 @@
         "patch": [
             { "op": "move", "path": "/b/c", "from": "/a" }
         ],
-        "error": "com.flipkart.zjsonpatch.JsonPatchApplicationException: [add] no such path in source (path: /b/c)"
+        "error": "JsonPatchException: [move] no such path in source (path: /b/c)"
     },
     {
         "message": "move operation for no such from path",
@@ -308,7 +316,7 @@
         "patch": [
             { "op": "move", "path": "/b/c", "from": "/a" }
         ],
-        "error": "com.flipkart.zjsonpatch.JsonPatchApplicationException: [add] no such path in source (path: /b/c)"
+        "error": "JsonPatchException: [move] no such path in source (path: /b/c)"
     },
     {
         "message": "move to same position",
@@ -368,7 +376,7 @@
         "patch": [
             { "op": "replace", "path": "/a" }
         ],
-        "error": "com.flipkart.zjsonpatch.InvalidJsonPatchException: invalid patch (missing field: value)"
+        "error": "JsonPatchException: [replace] invalid patch (missing field: value)"
     },
     {
         "message": "replace operation error for no such path",
@@ -376,7 +384,7 @@
         "patch": [
             { "op": "replace", "path": "/x/", "value": "y" }
         ],
-        "error": "com.flipkart.zjsonpatch.JsonPatchApplicationException: [replace] no such path in source (path: /x/)"
+        "error": "JsonPatchException: [replace] no such path in source (path: /x/)"
     },
     {
         "message": "replace operation error for no such from path",
@@ -384,7 +392,7 @@
         "patch": [
             { "op": "replace", "path": "/a/b", "value": "y" }
         ],
-        "error": "com.flipkart.zjsonpatch.JsonPatchApplicationException: [replace] no such path in source (path: /a/b)"
+        "error": "JsonPatchException: [replace] no such path in source (path: /a/b)"
     },
     {
         "message": "replace object against boolean",

@@ -31,16 +31,16 @@ public class JsonPatchBenchmark {
     private static final int WARMS = 2;
     private static final int RUNS = 20;
     private static final int LOOPS = 40;
-    private static final Set<CompatibilityFlags> FLAGS = //
-            EnumSet.of(CompatibilityFlags.ENABLE_ORIG_PATCH_GENERATOR);
+    private static final Set<FeatureFlags> FLAGS = //
+            EnumSet.of(FeatureFlags.ENABLE_ORIG_PATCH_GENERATOR);
 
     @SuppressWarnings("unchecked")
-    private static final Set<CompatibilityFlags>[] FLAGS_SET = new Set[] {
-            EnumSet.of(CompatibilityFlags.ENABLE_ORIG_PATCH_GENERATOR),
-            EnumSet.of(CompatibilityFlags.ENABLE_OPT_PATCH_GENERATOR),
-            EnumSet.of(CompatibilityFlags.ENABLE_OPT_PATCH_GENERATOR, CompatibilityFlags.DISABLE_PATCH_OPTIMIZATION),
-            EnumSet.of(CompatibilityFlags.ENABLE_FAST_PATCH_GENERATOR, CompatibilityFlags.DISABLE_PATCH_OPTIMIZATION),
-            EnumSet.of(CompatibilityFlags.ENABLE_SAME_PATCH_GENERATOR, CompatibilityFlags.DISABLE_PATCH_OPTIMIZATION)
+    private static final Set<FeatureFlags>[] FLAGS_SET = new Set[] {
+            EnumSet.of(FeatureFlags.ENABLE_ORIG_PATCH_GENERATOR),
+            EnumSet.of(FeatureFlags.ENABLE_OPT_PATCH_GENERATOR),
+            EnumSet.of(FeatureFlags.ENABLE_OPT_PATCH_GENERATOR, FeatureFlags.DISABLE_PATCH_OPTIMIZATION),
+            EnumSet.of(FeatureFlags.ENABLE_FAST_PATCH_GENERATOR, FeatureFlags.DISABLE_PATCH_OPTIMIZATION),
+            EnumSet.of(FeatureFlags.ENABLE_SAME_PATCH_GENERATOR, FeatureFlags.DISABLE_PATCH_OPTIMIZATION)
     };
 
     private static final String[] TOUR_PROPS =
@@ -89,7 +89,7 @@ public class JsonPatchBenchmark {
         for (int size = 2048; size <= 32768; size *= 2) {
             create(random, factory, source, target, FLAGS, size);
             checkMemory(200);
-            for (Set<CompatibilityFlags> flags : FLAGS_SET) {
+            for (Set<FeatureFlags> flags : FLAGS_SET) {
                 create(source, target, patch, flags, size, LOOPS);
                 // evaluate("actual", factory, source, target, patch, flags, RUNS);
                 checkMemory(200);
@@ -104,7 +104,7 @@ public class JsonPatchBenchmark {
         evaluate("actual", factory, source, target, patch, FLAGS, RUNS);
     }
 
-    private static List<JsonNode> createJsonPatchList(JsonNode source, JsonNode target, Set<CompatibilityFlags> flags) {
+    private static List<JsonNode> createJsonPatchList(JsonNode source, JsonNode target, Set<FeatureFlags> flags) {
         JsonNode patch = JsonDiff.asJson(source, target, flags);
         List<JsonNode> list = new ArrayList<JsonNode>(patch.size());
         Iterator<JsonNode> iter = patch.iterator();
@@ -115,13 +115,13 @@ public class JsonPatchBenchmark {
     }
 
     private static void create(final Random random, final JsonNodeFactory factory, final ObjectNode[] source,
-            final ObjectNode[] target, final List<JsonNode>[] patch, Set<CompatibilityFlags> flags, int size) {
+            final ObjectNode[] target, final List<JsonNode>[] patch, Set<FeatureFlags> flags, int size) {
         create(random, factory, source, target, flags, size);
         create(source, target, patch, flags, size, 1);
     }
 
     private static void create(final Random random, final JsonNodeFactory factory, final ObjectNode[] source,
-            final ObjectNode[] target, Set<CompatibilityFlags> flags, int size) {
+            final ObjectNode[] target, Set<FeatureFlags> flags, int size) {
         System.out.print("Setup tours [size=" + size + ", flags=" + flags + "] => ");
         long count = 0, start = System.nanoTime();
         for (int run = 0; run < RUNS; run++) {
@@ -137,7 +137,7 @@ public class JsonPatchBenchmark {
     }
 
     private static void create(final ObjectNode[] source, final ObjectNode[] target, final List<JsonNode>[] patch,
-            Set<CompatibilityFlags> flags, int size, int loops) {
+            Set<FeatureFlags> flags, int size, int loops) {
         System.out.print("Setup patchs [size=" + size + ", flags=" + flags + "] => ");
         long count = 0, start = System.nanoTime();
         for (int loop = 0; loop < loops; loop++) {
@@ -152,7 +152,7 @@ public class JsonPatchBenchmark {
     }
 
     private static void evaluate(String name, JsonNodeFactory factory, ObjectNode[] source, ObjectNode[] target,
-            final List<JsonNode>[] patch, Set<CompatibilityFlags> flags, int runs) {
+            final List<JsonNode>[] patch, Set<FeatureFlags> flags, int runs) {
         final JsonNode[] update = new JsonNode[RUNS];
         System.out.print("Running " + name + " [flags=" + flags + "] => ");
         long count = 0, start = System.nanoTime();

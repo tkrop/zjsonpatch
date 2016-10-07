@@ -4,9 +4,9 @@ import java.util.EnumSet;
 import java.util.Set;
 
 /**
- * Created by tomerga on 04/09/2016.
+ * Flags for enabling and disabling features.
  */
-public enum CompatibilityFlags {
+public enum FeatureFlags {
     /**
      * Represent nulls as missing values and vice versa.
      */
@@ -42,7 +42,7 @@ public enum CompatibilityFlags {
      */
     ENABLE_SAME_PATCH_GENERATOR;
 
-    public static Set<CompatibilityFlags> defaults() {
-        return EnumSet.of(ENABLE_FAST_PATCH_GENERATOR);
+    public static Set<FeatureFlags> defaults() {
+        return EnumSet.noneOf(FeatureFlags.class);
     }
 }

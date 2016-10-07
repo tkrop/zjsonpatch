@@ -10,9 +10,9 @@ import com.fasterxml.jackson.databind.node.JsonNodeType;
 
 abstract class JsonPatchGenerator {
 
-    protected final Set<CompatibilityFlags> flags;
+    protected final Set<FeatureFlags> flags;
 
-    public JsonPatchGenerator(Set<CompatibilityFlags> flags) {
+    public JsonPatchGenerator(Set<FeatureFlags> flags) {
         this.flags = flags;
     }
 

@@ -11,4 +11,5 @@ interface JsonPatchProcessor {
     JsonNode remove(List<String> path);
     JsonNode move(List<String> fromPath, List<String> toPath);
     JsonNode copy(List<String> fromPath, List<String> toPath);
+    JsonNode result();
 }

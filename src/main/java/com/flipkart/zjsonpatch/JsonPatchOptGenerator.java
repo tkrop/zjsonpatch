@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 final class JsonPatchOptGenerator extends JsonPatchLcsGenerator {
 
-    public JsonPatchOptGenerator(Set<CompatibilityFlags> flags) {
+    public JsonPatchOptGenerator(Set<FeatureFlags> flags) {
         super(flags);
     }
 

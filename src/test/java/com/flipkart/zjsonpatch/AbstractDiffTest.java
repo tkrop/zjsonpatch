@@ -6,6 +6,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -27,7 +28,7 @@ public abstract class AbstractDiffTest {
 
     private Actual operation(JsonNode first, JsonNode second) {
         Actual actual = new Actual();
-        Set<CompatibilityFlags> flags = p.getFlags();
+        Set<FeatureFlags> flags = p.getFlags();
         if (flags == null) {
             actual.patch = JsonDiff.asJson(first, second);
             actual.second = JsonPatch.apply(actual.patch, first);
@@ -73,7 +74,7 @@ public abstract class AbstractDiffTest {
 
             fail("Failure expected: " + ((error != null) ? error : node.get("message")));
         } catch (Exception ex) {
-            assertThat(ex.toString(), equalTo(error));
+            assertThat(ex.toString(), containsString(error));
         }
     }
 }

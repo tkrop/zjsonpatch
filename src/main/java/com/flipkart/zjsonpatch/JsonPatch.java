@@ -3,6 +3,7 @@ package com.flipkart.zjsonpatch;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -11,102 +12,107 @@ import java.util.Set;
  * User: gopi.vishwakarma Date: 31/07/14
  */
 public final class JsonPatch {
+    private final Set<FeatureFlags> flags;
 
-    private JsonPatch() {
+    private JsonPatch(Set<FeatureFlags> flags) {
+        this.flags = flags;
     }
 
-    private static JsonNode getPatchAttr(JsonNode node, String attr) {
-        JsonNode child = node.get(attr);
-        if (child == null) {
-            throw new InvalidJsonPatchException("invalid patch (missing field: " + attr + ")");
-        }
-        return child;
-    }
-
-    private static JsonNode getPatchAttrWithDefault(JsonNode node, String attr, JsonNode defaultValue) {
-        JsonNode child = node.get(attr);
-        return (child == null) ? defaultValue : child;
-    }
-
-    private static JsonNode getPatchAttr(JsonNode node, Set<CompatibilityFlags> flags) {
-        if (!flags.contains(CompatibilityFlags.MISSING_VALUES_AS_NULLS)) {
-            return getPatchAttr(node, Constants.VALUE);
+    private JsonNode value(JsonNode node) {
+        if (!flags.contains(FeatureFlags.MISSING_VALUES_AS_NULLS)) {
+            return JsonPatchHelper.getPatchAttr(node, Constants.VALUE);
         } else {
-            return getPatchAttrWithDefault(node, Constants.VALUE, NullNode.getInstance());
+            return JsonPatchHelper.getPatchAttrWithDefault(node, Constants.VALUE, NullNode.getInstance());
         }
     }
 
-    private static void process(JsonNode patch, JsonPatchProcessor processor, Set<CompatibilityFlags> flags)
-            throws InvalidJsonPatchException {
+    private void patch(JsonPatchProcessor processor, JsonNode patch) {
+        Operation operation = Operation.fromRfcName(JsonPatchHelper.getPatchAttr(patch, Constants.OP).asText());
+        List<String> path = JsonPathHelper.getPath(JsonPatchHelper.getPatchAttr(patch, Constants.PATH).asText());
 
+        switch (operation) {
+            case ADD: {
+                JsonNode value = value(patch);
+                processor.add(path, value);
+                break;
+            }
+
+            case TEST: {
+                JsonNode value = value(patch);
+                processor.test(path, value);
+                break;
+            }
+
+            case REPLACE: {
+                JsonNode value = value(patch);
+                processor.replace(path, value);
+                break;
+            }
+
+            case REMOVE: {
+                processor.remove(path);
+                break;
+            }
+
+            case MOVE: {
+                List<String> fromPath =
+                        JsonPathHelper.getPath(JsonPatchHelper.getPatchAttr(patch, Constants.FROM).asText());
+                processor.move(fromPath, path);
+                break;
+            }
+
+            case COPY: {
+                List<String> fromPath =
+                        JsonPathHelper.getPath(JsonPatchHelper.getPatchAttr(patch, Constants.FROM).asText());
+                processor.copy(fromPath, path);
+                break;
+            }
+        }
+    }
+
+    private List<JsonPatchException> apply(JsonPatchProcessor processor, Iterator<JsonNode> patches) {
+        List<JsonPatchException> excepts = new ArrayList<JsonPatchException>();
+        for (int index = 0; patches.hasNext(); index++) {
+            try {
+                JsonNode patch = patches.next();
+                if (!patch.isObject()) {
+                    throw new JsonPatchException("invalid patch (patch not an object - index: " + index + ")");
+                }
+                try {
+                    patch(processor, patch);
+                } catch (JsonPatchException except) {
+                    throw new JsonPatchException(JsonPatchHelper.getErrorMessage(except, patch, index), except);
+                }
+            } catch (JsonPatchException except) {
+                excepts.add(except);
+            }
+        }
+        return excepts;
+    }
+
+    private JsonNode apply(JsonPatchProcessor processor, JsonNode patch) {
         if (!patch.isArray()) {
-            throw new InvalidJsonPatchException("invalid patch (root not an array)");
+            throw new JsonPatchException("invalid patch (root not an array)");
         }
-        Iterator<JsonNode> operations = patch.iterator();
-        for (int index = 0; operations.hasNext(); index++) {
-            JsonNode node = operations.next();
-            if (!node.isObject()) {
-                throw new InvalidJsonPatchException("invalid patch (patch not an object - index: " + index + ")");
-            }
-            Operation operation = Operation.fromRfcName(getPatchAttr(node, Constants.OP).asText());
-            List<String> path = JsonPathHelper.getPath(getPatchAttr(node, Constants.PATH).asText());
-
-            switch (operation) {
-                case ADD: {
-                    JsonNode value = getPatchAttr(node, flags);
-                    processor.add(path, value);
-                    break;
-                }
-
-                case TEST: {
-                    JsonNode value = getPatchAttr(node, flags);
-                    processor.test(path, value);
-                    break;
-                }
-
-                case REPLACE: {
-                    JsonNode value = getPatchAttr(node, flags);
-                    processor.replace(path, value);
-                    break;
-                }
-
-                case REMOVE: {
-                    processor.remove(path);
-                    break;
-                }
-
-                case MOVE: {
-                    List<String> fromPath = JsonPathHelper.getPath(getPatchAttr(node, Constants.FROM).asText());
-                    processor.move(fromPath, path);
-                    break;
-                }
-
-                case COPY: {
-                    List<String> fromPath = JsonPathHelper.getPath(getPatchAttr(node, Constants.FROM).asText());
-                    processor.copy(fromPath, path);
-                    break;
-                }
-            }
-        }
-    }
-
-    public static void validate(JsonNode patch, Set<CompatibilityFlags> flags) throws InvalidJsonPatchException {
-        process(patch, NoopProcessor.INSTANCE, flags);
-    }
-
-    public static void validate(JsonNode patch) throws InvalidJsonPatchException {
-        validate(patch, CompatibilityFlags.defaults());
-    }
-
-    public static JsonNode apply(JsonNode patch, JsonNode source, Set<CompatibilityFlags> flags)
-            throws JsonPatchApplicationException {
-        ApplyProcessor processor = new ApplyProcessor(
-                flags.contains(CompatibilityFlags.ENABLE_PATCH_IN_PLACE) ? source : source.deepCopy());
-        process(patch, processor, flags);
+        JsonPatchHelper.rethrowExceptions(apply(processor, patch.iterator()));
         return processor.result();
     }
 
-    public static JsonNode apply(JsonNode patch, JsonNode source) throws JsonPatchApplicationException {
-        return apply(patch, source, CompatibilityFlags.defaults());
+    public static void validate(JsonNode patch, Set<FeatureFlags> flags) throws JsonPatchException {
+        new JsonPatch(flags).apply(JsonPatchNoopProcessor.INSTANCE, patch);
+    }
+
+    public static void validate(JsonNode patch) throws JsonPatchException {
+        validate(patch, FeatureFlags.defaults());
+    }
+
+    public static JsonNode apply(JsonNode patch, JsonNode source, Set<FeatureFlags> flags)
+            throws JsonPatchException {
+        JsonNode target = flags.contains(FeatureFlags.ENABLE_PATCH_IN_PLACE) ? source : source.deepCopy();
+        return new JsonPatch(flags).apply(new JsonPatchApplyProcessor(target), patch);
+    }
+
+    public static JsonNode apply(JsonNode patch, JsonNode source) throws JsonPatchException {
+        return apply(patch, source, FeatureFlags.defaults());
     }
 }

@@ -14,13 +14,13 @@ enum Operation {
 
     private final String name = this.name().toLowerCase().intern();
 
-    public static Operation fromRfcName(String name) throws InvalidJsonPatchException {
+    public static Operation fromRfcName(String name) throws JsonPatchException {
         for (Operation  op : Operation.values()) {
             if (op.name.equalsIgnoreCase(name)) {
                 return op;
             }
         }
-        throw new InvalidJsonPatchException("invalid patch (unsupported operation: " + name +")");
+        throw new JsonPatchException("invalid patch (unsupported operation: " + name +")");
     }
 
     public String getName() {

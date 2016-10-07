@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 final class JsonPatchSameGenerator extends JsonPatchGenerator {
 
-    public JsonPatchSameGenerator(Set<CompatibilityFlags> flags) {
+    public JsonPatchSameGenerator(Set<FeatureFlags> flags) {
         super(flags);
     }
 

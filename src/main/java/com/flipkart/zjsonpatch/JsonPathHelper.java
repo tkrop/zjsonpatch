@@ -12,7 +12,7 @@ class JsonPathHelper {
             if (index != 0) {
                 builder.append('/');
             }
-            builder.append(path.get(index));
+            builder.append(encodeSubPath(path.get(index)));
         }
         return builder.toString();
     }

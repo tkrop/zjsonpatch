@@ -22,11 +22,11 @@ public class JsLibSamplesTest extends AbstractPatchTest {
     @Parameterized.Parameters(name = "{index}: {0}")
     public static Collection<TestCase> data() throws IOException {
         List<TestCase> tests = new ArrayList<TestCase>();
-        for (Set<CompatibilityFlags> flags : new Set[]{
-                EnumSet.of(CompatibilityFlags.ENABLE_ORIG_PATCH_GENERATOR),
-                EnumSet.of(CompatibilityFlags.ENABLE_OPT_PATCH_GENERATOR),
-                EnumSet.of(CompatibilityFlags.ENABLE_FAST_PATCH_GENERATOR),
-                EnumSet.of(CompatibilityFlags.ENABLE_SAME_PATCH_GENERATOR)
+        for (Set<FeatureFlags> flags : new Set[]{
+                EnumSet.of(FeatureFlags.ENABLE_ORIG_PATCH_GENERATOR),
+                EnumSet.of(FeatureFlags.ENABLE_OPT_PATCH_GENERATOR),
+                EnumSet.of(FeatureFlags.ENABLE_FAST_PATCH_GENERATOR),
+                EnumSet.of(FeatureFlags.ENABLE_SAME_PATCH_GENERATOR)
         }) {
             for (TestCase test : TestCase.load("js-libs-samples")) {
                 tests.add(test.addFalgs(flags));

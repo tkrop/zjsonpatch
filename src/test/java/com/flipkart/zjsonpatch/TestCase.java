@@ -32,19 +32,19 @@ public class TestCase {
         return node;
     }
 
-    public TestCase addFalgs(Set<CompatibilityFlags> flags) {
+    public TestCase addFalgs(Set<FeatureFlags> flags) {
         ArrayNode tflags = (ArrayNode) node.get("flags");
         if (tflags == null) {
             tflags = node.putArray("flags");
         }
-        for (CompatibilityFlags flag : flags) {
+        for (FeatureFlags flag : flags) {
             tflags.add(flag.toString());
         }
         return this;
     }
 
-    public Set<CompatibilityFlags> getFlags() {
-        Set<CompatibilityFlags> flags = new HashSet<CompatibilityFlags>();
+    public Set<FeatureFlags> getFlags() {
+        Set<FeatureFlags> flags = new HashSet<FeatureFlags>();
         if (node.has("flags")) {
             for (JsonNode name : node.get("flags")) {
                 if (name != null && name.isTextual()) {
@@ -55,8 +55,8 @@ public class TestCase {
         return flags.isEmpty() ? null : EnumSet.copyOf(flags);
     }
 
-    private CompatibilityFlags getFlag(String name) {
-        for (CompatibilityFlags flag : CompatibilityFlags.values()) {
+    private FeatureFlags getFlag(String name) {
+        for (FeatureFlags flag : FeatureFlags.values()) {
             if (flag.name().equalsIgnoreCase(name)) {
                 return flag;
             }

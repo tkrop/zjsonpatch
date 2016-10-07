@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -30,7 +31,7 @@ public abstract class AbstractPatchTest {
     }
 
     private JsonNode operation(JsonNode first, JsonNode patch) {
-        Set<CompatibilityFlags> flags = p.getFlags();
+        Set<FeatureFlags> flags = p.getFlags();
         if (flags == null) {
             JsonPatch.validate(patch);
             return JsonPatch.apply(patch, first);
@@ -73,7 +74,7 @@ public abstract class AbstractPatchTest {
             fail("Failure expected: " + ((error != null) ? error : node.get("message")));
         } catch (Exception ex) {
             if (error != null) {
-                assertThat(ex.toString(), equalTo(error));
+                assertThat(ex.toString(), containsString(error));
             }
         }
     }

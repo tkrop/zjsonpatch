@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 final class JsonPatchFastGenerator extends JsonPatchLcsGenerator {
 
-    public JsonPatchFastGenerator(Set<CompatibilityFlags> flags) {
+    public JsonPatchFastGenerator(Set<FeatureFlags> flags) {
         super(flags);
     }
 

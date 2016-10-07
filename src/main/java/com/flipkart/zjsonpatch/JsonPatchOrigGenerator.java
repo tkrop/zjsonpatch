@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 final class JsonPatchOrigGenerator extends JsonPatchGenerator {
 
-    public JsonPatchOrigGenerator(Set<CompatibilityFlags> flags) {
+    public JsonPatchOrigGenerator(Set<FeatureFlags> flags) {
         super(flags);
     }
 

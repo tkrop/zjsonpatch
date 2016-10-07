@@ -5,13 +5,14 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Merging remove & add to move operation
+ * Merging remove and add to a single move operation.
  */
-final class CompactHelper {
+final class JsonPatchCompactHelper {
 
-    private final Set<CompatibilityFlags> flags;
+    @SuppressWarnings("unused")
+    private final Set<FeatureFlags> flags;
 
-    public CompactHelper(Set<CompatibilityFlags> flags) {
+    public JsonPatchCompactHelper(Set<FeatureFlags> flags) {
         this.flags = flags;
     }
 

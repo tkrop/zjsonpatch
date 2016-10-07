@@ -6,14 +6,15 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.util.List;
 
-class ApplyProcessor implements JsonPatchProcessor {
+class JsonPatchApplyProcessor implements JsonPatchProcessor {
 
     private JsonNode target;
 
-    ApplyProcessor(JsonNode target) {
+    JsonPatchApplyProcessor(JsonNode target) {
         this.target = target;
     }
 
+    @Override
     public JsonNode result() {
         return target;
     }
@@ -22,15 +23,15 @@ class ApplyProcessor implements JsonPatchProcessor {
     public JsonNode add(List<String> path, JsonNode value) {
         JsonNode parent = getParent(path);
         if (parent == null) {
-            throw new JsonPatchApplicationException(
-                    "[add] no such path in source (path: " + JsonPathHelper.toString(path) + ")");
+            throw new JsonPatchException(
+                    "no such path in source (path: " + JsonPathHelper.toString(path) + ")");
         }
         String field = path.get(path.size() - 1);
         if (field.isEmpty() && path.size() == 1) {
             target = value;
         } else if (!parent.isContainerNode()) {
-            throw new JsonPatchApplicationException(
-                    "[add] parent is not a container in source (path: " + JsonPathHelper.toString(path)
+            throw new JsonPatchException(
+                    "parent is not a container in source (path: " + JsonPathHelper.toString(path)
                             + " | node: " + parent + ")");
         } else if (parent.isArray()) {
             addToArray(path, value, parent);
@@ -63,11 +64,11 @@ class ApplyProcessor implements JsonPatchProcessor {
     public JsonNode test(List<String> path, JsonNode value) {
         JsonNode node = getNode(target, path, 1);
         if (node == null) {
-            throw new JsonPatchApplicationException(
-                    "[test] no such path in source (path: " + JsonPathHelper.toString(path) + ")");
+            throw new JsonPatchException(
+                    "no such path in source (path: " + JsonPathHelper.toString(path) + ")");
         } else if (!node.equals(value)) {
-            throw new JsonPatchApplicationException(
-                    "[test] value differs from expectations (path: " + JsonPathHelper.toString(path)
+            throw new JsonPatchException(
+                    "value differs from expectations (path: " + JsonPathHelper.toString(path)
                             + " | value: " + value + " | node: " + node + ")");
         }
         return value;
@@ -77,8 +78,8 @@ class ApplyProcessor implements JsonPatchProcessor {
     public JsonNode replace(List<String> path, JsonNode value) {
         JsonNode parent = getParent(path);
         if (parent == null) {
-            throw new JsonPatchApplicationException(
-                    "[replace] no such path in source (path: " + JsonPathHelper.toString(path) + ")");
+            throw new JsonPatchException(
+                    "no such path in source (path: " + JsonPathHelper.toString(path) + ")");
         }
         String field = path.get(path.size() - 1);
         if (field.isEmpty() && path.size() == 1) {
@@ -88,8 +89,8 @@ class ApplyProcessor implements JsonPatchProcessor {
         } else if (parent.isArray()) {
             ((ArrayNode) parent).set(arrayIndex(field, parent.size() - 1, path), value);
         } else {
-            throw new JsonPatchApplicationException(
-                    "[replace] no such path in source (path: " + JsonPathHelper.toString(path) + ")");
+            throw new JsonPatchException(
+                    "no such path in source (path: " + JsonPathHelper.toString(path) + ")");
         }
         return value;
     }
@@ -98,8 +99,8 @@ class ApplyProcessor implements JsonPatchProcessor {
     public JsonNode remove(List<String> path) {
         JsonNode parent = getParent(path);
         if (parent == null) {
-            throw new JsonPatchApplicationException(
-                    "[remove] no such path in source (path: " + JsonPathHelper.toString(path) + ")");
+            throw new JsonPatchException(
+                    "no such path in source (path: " + JsonPathHelper.toString(path) + ")");
         }
         String field = path.get(path.size() - 1);
         if (parent.isObject()) {
@@ -107,8 +108,8 @@ class ApplyProcessor implements JsonPatchProcessor {
         } else if (parent.isArray()) {
             return ((ArrayNode) parent).remove(arrayIndex(field, parent.size() - 1, path));
         }
-        throw new JsonPatchApplicationException(
-                "[remove] no such path in source (path: " + JsonPathHelper.toString(path) + ")");
+        throw new JsonPatchException(
+                "no such path in source (path: " + JsonPathHelper.toString(path) + ")");
     }
 
     @Override
@@ -150,7 +151,7 @@ class ApplyProcessor implements JsonPatchProcessor {
     private int arrayIndex(String string, int max, List<String> path) {
         int index = Integer.parseInt(string);
         if (index < 0 || index > max) {
-            throw new JsonPatchApplicationException(
+            throw new JsonPatchException(
                     "index out of bounds (path: " + JsonPathHelper.toString(path) + " | index: " + index
                             + " | bounds: 0-" + max + ")");
         }
