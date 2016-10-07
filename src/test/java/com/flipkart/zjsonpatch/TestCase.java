@@ -2,6 +2,9 @@ package com.flipkart.zjsonpatch;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -15,28 +18,32 @@ import org.apache.commons.io.IOUtils;
 
 public class TestCase {
 
-    private final boolean operation;
-    private final JsonNode node;
+    private final ObjectNode node;
 
-    private TestCase(JsonNode node) {
-        this.operation = !node.has("error");
-        this.node = node;
-    }
-
-    private TestCase(JsonNode node, boolean operation) {
-        this.operation = !node.has("error") && operation;
+    private TestCase(ObjectNode node) {
         this.node = node;
     }
 
     public boolean isOperation() {
-        return operation;
+        return !node.has("error");
     }
 
-    public JsonNode getNode() {
+    public ObjectNode getNode() {
         return node;
     }
 
-    public EnumSet<CompatibilityFlags> getFlags() {
+    public TestCase addFalgs(Set<CompatibilityFlags> flags) {
+        ArrayNode tflags = (ArrayNode) node.get("flags");
+        if (tflags == null) {
+            tflags = node.putArray("flags");
+        }
+        for (CompatibilityFlags flag : flags) {
+            tflags.add(flag.toString());
+        }
+        return this;
+    }
+
+    public Set<CompatibilityFlags> getFlags() {
         Set<CompatibilityFlags> flags = new HashSet<CompatibilityFlags>();
         if (node.has("flags")) {
             for (JsonNode name : node.get("flags")) {
@@ -69,21 +76,22 @@ public class TestCase {
         if (tree.isArray()) {
             for (JsonNode node : tree) {
                 if (isEnabled(node)) {
-                    result.add(new TestCase(node, true));
+                    result.add(new TestCase((ObjectNode) node));
                 }
             }
         } else if (tree.isObject()) {
             if (tree.has("errors")) {
                 for (JsonNode node : tree.get("errors")) {
                     if (isEnabled(node)) {
-                        result.add(new TestCase(node, false));
+                        ((ObjectNode) node).putNull("error");
+                        result.add(new TestCase((ObjectNode) node));
                     }
                 }
             }
             if (tree.has("ops")) {
                 for (JsonNode node : tree.get("ops")) {
                     if (isEnabled(node)) {
-                        result.add(new TestCase(node, true));
+                        result.add(new TestCase((ObjectNode) node));
                     }
                 }
             }
@@ -101,6 +109,19 @@ public class TestCase {
 
     @Override
     public String toString() {
-        return node.has("message") ? node.get("message").toString() : super.toString();
+        StringBuilder builder = new StringBuilder();
+        if (node.has("message")) {
+            builder.append(node.get("message").asText());
+        }
+        if (node.has("flags")) {
+            if (builder.length() != 0) {
+                builder.append(' ');
+            }
+            builder.append(getFlags().toString());
+        }
+        if (builder.length() == 0) {
+            builder.append(super.toString());
+        }
+        return builder.toString();
     }
 }

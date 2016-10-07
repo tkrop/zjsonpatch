@@ -62,7 +62,7 @@ final class JsonPatchFastGenerator extends JsonPatchLcsGenerator {
             List<Object> path = JsonPathHelper.getPathExt(this.path, pos);
             if (op != Operation.REMOVE) {
                 queue(Operation.ADD, path, node);
-            } else {
+            } else { // This code seems to be not reachable because of LCS algorithm.
                 Diff diff = deque.remove();
                 generate(path, diff.getValue(), node);
             }

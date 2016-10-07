@@ -20,7 +20,7 @@ enum Operation {
                 return op;
             }
         }
-        throw new InvalidJsonPatchException("unknown / unsupported operation " + name);
+        throw new InvalidJsonPatchException("invalid patch (unsupported operation: " + name +")");
     }
 
     public String getName() {

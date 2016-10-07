@@ -153,7 +153,7 @@
         ]
     },
     {
-        "message": "cover lots of things example",
+        "message": "cover lots of array things example (TODO: separate)",
         "first": { "b": [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ] },
         "second": { "b": [ 1, 6, 2, 3, 5, 7, 0, 8 ], "c": 4 },
         "patch": [
@@ -163,7 +163,7 @@
         ]
     },
     {
-        "message": "cover lots of things example",
+        "message": "cover lots of object things example (TODO: separate)",
         "first": { "a": [ { "a" : 0 }, { "c": 1 }, { "f": 3 }, { "g": 4, "h": { "j": 6 } } ] },
         "second": { "a": [ { "c": 1, "d": { "e": 2 } }, { "f": 3 }, { "g": 4, "h": { "i": 5, "j": 6 } }, { "k": 7 } ], "l": 8 },
         "patch": [
@@ -175,20 +175,5 @@
             { "op": "add", "path": "/a/3", "value": { "k": 7 } },
             { "op": "add", "path": "/l", "value":8 }
         ]
-    },
-    {
-        "message": "cover lots of things example",
-        "first": { "a": [ { "a" : 0 }, { "c": 1 }, { "f": 3 }, { "g": 4, "h": { "j": 6 } } ] },
-        "second": { "a": [ { "c": 1, "d": { "e": 2 } }, { "f": 3 }, { "g": 4, "h": { "i": 5, "j": 6 } }, { "k": 7 } ], "l": 8 },
-        "patch": [
-            { "op": "remove", "path": "/a/0/a" },
-            { "op": "add", "path": "/a/0/c", "value": 1 },
-            { "op": "add", "path":"/a/0/d", "value":{ "e": 2 } },
-            { "op": "remove", "path": "/a/1" },
-            { "op": "add", "path": "/a/2/h/i", "value": 5 },
-            { "op": "add", "path": "/a/3", "value": { "k": 7 } },
-            { "op": "add", "path": "/l", "value": 8 }
-        ],
-        "flags": [ "ENABLE_FAST_PATCH_GENERATOR" ]
     }
 ]

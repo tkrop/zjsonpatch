@@ -11,7 +11,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import java.util.EnumSet;
+import java.util.Set;
 
 @RunWith(Parameterized.class)
 public abstract class AbstractPatchTest {
@@ -30,7 +30,7 @@ public abstract class AbstractPatchTest {
     }
 
     private JsonNode operation(JsonNode first, JsonNode patch) {
-        EnumSet<CompatibilityFlags> flags = p.getFlags();
+        Set<CompatibilityFlags> flags = p.getFlags();
         if (flags == null) {
             JsonPatch.validate(patch);
             return JsonPatch.apply(patch, first);
@@ -66,11 +66,11 @@ public abstract class AbstractPatchTest {
 
         JsonNode first = node.get(rfc ? "node" : "first");
         JsonNode patch = node.get(rfc ? "op" : "patch");
-        String error = node.has("error") ? node.get("error").asText() : null;
+        String error = node.has("error") && !node.get("error").isNull() ? node.get("error").asText() : null;
 
         try {
             operation(first, patch);
-            fail("Failure expected: " + node.get("message"));
+            fail("Failure expected: " + ((error != null) ? error : node.get("message")));
         } catch (Exception ex) {
             if (error != null) {
                 assertThat(ex.toString(), equalTo(error));

@@ -18,7 +18,7 @@ public final class JsonPatch {
     private static JsonNode getPatchAttr(JsonNode node, String attr) {
         JsonNode child = node.get(attr);
         if (child == null) {
-            throw new InvalidJsonPatchException("Invalid JSON Patch payload (missing '" + attr + "' field)");
+            throw new InvalidJsonPatchException("invalid patch (missing field: " + attr + ")");
         }
         return child;
     }
@@ -40,13 +40,13 @@ public final class JsonPatch {
             throws InvalidJsonPatchException {
 
         if (!patch.isArray()) {
-            throw new InvalidJsonPatchException("Invalid JSON Patch payload (not an array)");
+            throw new InvalidJsonPatchException("invalid patch (root not an array)");
         }
         Iterator<JsonNode> operations = patch.iterator();
-        while (operations.hasNext()) {
+        for (int index = 0; operations.hasNext(); index++) {
             JsonNode node = operations.next();
             if (!node.isObject()) {
-                throw new InvalidJsonPatchException("Invalid JSON Patch payload (not an object)");
+                throw new InvalidJsonPatchException("invalid patch (patch not an object - index: " + index + ")");
             }
             Operation operation = Operation.fromRfcName(getPatchAttr(node, Constants.OP).asText());
             List<String> path = JsonPathHelper.getPath(getPatchAttr(node, Constants.PATH).asText());

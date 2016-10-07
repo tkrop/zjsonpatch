@@ -40,7 +40,7 @@ public final class JsonDiff {
         } else if (flags.contains(CompatibilityFlags.ENABLE_ORIG_PATCH_GENERATOR)) {
             return new JsonPatchOrigGenerator(flags);
         }
-        throw new JsonPatchApplicationException("no patch generator enabled");
+        return new JsonPatchOptGenerator(flags);
     }
 
     private static ArrayNode getJsonNodes(List<Diff> diffs, Set<CompatibilityFlags> flags) {

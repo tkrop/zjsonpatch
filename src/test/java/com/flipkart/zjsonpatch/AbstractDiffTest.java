@@ -10,7 +10,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import java.util.EnumSet;
+import java.util.Set;
 
 /**
  * Abstract JSON Diff test.
@@ -27,7 +27,7 @@ public abstract class AbstractDiffTest {
 
     private Actual operation(JsonNode first, JsonNode second) {
         Actual actual = new Actual();
-        EnumSet<CompatibilityFlags> flags = p.getFlags();
+        Set<CompatibilityFlags> flags = p.getFlags();
         if (flags == null) {
             actual.patch = JsonDiff.asJson(first, second);
             actual.second = JsonPatch.apply(actual.patch, first);
@@ -66,12 +66,12 @@ public abstract class AbstractDiffTest {
 
         JsonNode first = node.get("first");
         JsonNode patch = node.get("patch");
-        String error = node.get("error").toString();
+        String error = node.has("error") && !node.get("error").isNull() ? node.get("error").asText() : null;
 
         try {
             JsonPatch.apply(patch, first);
 
-            fail("Failure expected: " + node.get("message"));
+            fail("Failure expected: " + ((error != null) ? error : node.get("message")));
         } catch (Exception ex) {
             assertThat(ex.toString(), equalTo(error));
         }

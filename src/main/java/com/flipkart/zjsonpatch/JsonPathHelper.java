@@ -5,6 +5,18 @@ import java.util.List;
 
 class JsonPathHelper {
 
+    public static String toString(List<String> path) {
+        StringBuilder builder = new StringBuilder();
+        int size = path.size();
+        for (int index = 0; index < size; index++) {
+            if (index != 0) {
+                builder.append('/');
+            }
+            builder.append(path.get(index));
+        }
+        return builder.toString();
+    }
+
     public static List<String> getPath(String path) {
         List<String> paths = new ArrayList<String>();
         int index = 0, last = 0, len = path.length();
@@ -27,7 +39,7 @@ class JsonPathHelper {
         return ext;
     }
 
-    public static String getPathRep(List<Object> path) {
+    public static String getPathRep(List<?> path) {
         StringBuilder builder = new StringBuilder();
         for (Object elem : path) {
             builder.append('/').append(encodeSubPath(elem.toString()));
