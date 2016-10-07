@@ -2,105 +2,105 @@
     "errors": [
         {
             "message": "A.9.  Testing a Value: Error",
-            "op": [{ "op": "test", "path": "/baz", "value": "bar" }],
-            "node": { "baz": "qux" }
+            "patch": [{ "op": "test", "path": "/baz", "value": "bar" }],
+            "source": { "baz": "qux" }
         },
         {
             "message": "A.12.  Adding to a Nonexistent Target",
-            "op": [{ "op": "add", "path": "/baz/bat", "value": "qux" }],
-            "node": { "foo": "bar" }
+            "patch": [{ "op": "add", "path": "/baz/bat", "value": "qux" }],
+            "source": { "foo": "bar" }
         },
         {
             "message": "A.13.  Invalid JSON Patch Document",
-            "op": [{ "op": "add", "path": "/baz", "value": "qux", "op": "remove" }],
-            "node": { "foo": "bar" },
+            "patch": [{ "op": "add", "path": "/baz", "value": "qux", "op": "remove" }],
+            "source": { "foo": "bar" },
             "disabled": "works without exception!"
         },
         {
             "message": "A.15.  Comparing Strings and Numbers",
-            "op": [{"op": "test", "path": "/~01", "value": "10"}],
-            "node": { "/": 9, "~1": 10 }
+            "patch": [{"op": "test", "path": "/~01", "value": "10"}],
+            "source": { "/": 9, "~1": 10 }
         }
     ],
     "ops": [
         {
             "message": "A.1.  Adding an Object Member",
-            "op": [{ "op": "add", "path": "/baz", "value": "qux" }],
-            "node": { "foo": "bar" },
-            "expected": { "baz": "qux", "foo": "bar" }
+            "patch": [{ "op": "add", "path": "/baz", "value": "qux" }],
+            "source": { "foo": "bar" },
+            "target": { "baz": "qux", "foo": "bar" }
         },
         {
             "message": "A.2.  Adding an Array Element",
-            "op": [{ "op": "add", "path": "/foo/1", "value": "qux" }],
-            "node": { "foo": [ "bar", "baz" ] },
-            "expected": { "foo": [ "bar", "qux", "baz" ] }
+            "patch": [{ "op": "add", "path": "/foo/1", "value": "qux" }],
+            "source": { "foo": [ "bar", "baz" ] },
+            "target": { "foo": [ "bar", "qux", "baz" ] }
         },
         {
             "message": "A.3.  Removing an Object Member",
-            "op": [ { "op": "remove", "path": "/baz" }],
-            "node": { "baz": "qux", "foo": "bar" },
-            "expected": { "foo": "bar" }
+            "patch": [ { "op": "remove", "path": "/baz" }],
+            "source": { "baz": "qux", "foo": "bar" },
+            "target": { "foo": "bar" }
         },
         {
             "message": "A.4.  Removing an Array Element",
-            "op": [{ "op": "remove", "path": "/foo/1" }],
-            "node": { "foo": [ "bar", "qux", "baz" ] },
-            "expected": { "foo": [ "bar", "baz" ] }
+            "patch": [{ "op": "remove", "path": "/foo/1" }],
+            "source": { "foo": [ "bar", "qux", "baz" ] },
+            "target": { "foo": [ "bar", "baz" ] }
         },
         {
             "message": "A.5.  Replacing a Value",
-            "op": [{ "op": "replace", "path": "/baz", "value": "boo" }],
-            "node": { "baz": "qux", "foo": "bar" },
-            "expected": { "baz": "boo", "foo": "bar" }
+            "patch": [{ "op": "replace", "path": "/baz", "value": "boo" }],
+            "source": { "baz": "qux", "foo": "bar" },
+            "target": { "baz": "boo", "foo": "bar" }
         },
         {
             "message": "A.6.  Moving a Value",
-            "op": [{ "op": "move", "from": "/foo/waldo", "path": "/qux/thud" }],
-            "node": {
+            "patch": [{ "op": "move", "from": "/foo/waldo", "path": "/qux/thud" }],
+            "source": {
                 "foo": { "bar": "baz", "waldo": "fred" },
                 "qux": { "corge": "grault" }
             },
-            "expected": {
+            "target": {
                 "foo": { "bar": "baz" },
                 "qux": { "corge": "grault", "thud": "fred" }
             }
         },
         {
             "message": "A.7.  Moving an Array Element",
-            "op": [{ "op": "move", "from": "/foo/1", "path": "/foo/3" }],
-            "node": { "foo": [ "all", "grass", "cows", "eat" ] },
-            "expected": { "foo": [ "all", "cows", "eat", "grass" ] }
+            "patch": [{ "op": "move", "from": "/foo/1", "path": "/foo/3" }],
+            "source": { "foo": [ "all", "grass", "cows", "eat" ] },
+            "target": { "foo": [ "all", "cows", "eat", "grass" ] }
         },
         {
             "message": "A.8.  Testing a Value: Success",
-            "op": [{ "op": "test", "path": "/baz", "value": "qux" },
+            "patch": [{ "op": "test", "path": "/baz", "value": "qux" },
                 { "op": "test", "path": "/foo/1", "value": 2 }],
-            "node": { "baz": "qux", "foo": [ "a", 2, "c" ] },
-            "expected": { "baz": "qux", "foo": [ "a", 2, "c" ] }
+            "source": { "baz": "qux", "foo": [ "a", 2, "c" ] },
+            "target": { "baz": "qux", "foo": [ "a", 2, "c" ] }
         },
         {
             "message": "A.10.  Adding a Nested Member Object",
-            "op": [{ "op": "add", "path": "/child", "value": { "grandchild": { } } }],
-            "node": { "foo": "bar" },
-            "expected": { "foo": "bar", "child": { "grandchild": { } } }
+            "patch": [{ "op": "add", "path": "/child", "value": { "grandchild": { } } }],
+            "source": { "foo": "bar" },
+            "target": { "foo": "bar", "child": { "grandchild": { } } }
         },
         {
             "message": "A.11.  Ignoring Unrecognized Elements",
-            "op": [{ "op": "add", "path": "/baz", "value": "qux", "xyz": 123 }],
-            "node": { "foo": "bar" },
-            "expected": { "foo": "bar", "baz": "qux" }
+            "patch": [{ "op": "add", "path": "/baz", "value": "qux", "xyz": 123 }],
+            "source": { "foo": "bar" },
+            "target": { "foo": "bar", "baz": "qux" }
         },
         {
             "message": "A.14.  ~ Escape Ordering",
-            "op": [{"op": "test", "path": "/~01", "value": 10}],
-            "node": { "/": 9, "~1": 10 },
-            "expected": { "/": 9, "~1": 10 }
+            "patch": [{"op": "test", "path": "/~01", "value": 10}],
+            "source": { "/": 9, "~1": 10 },
+            "target": { "/": 9, "~1": 10 }
         },
         {
             "message": "A.16.  Adding an Array Value",
-            "op": [{ "op": "add", "path": "/foo/-", "value": ["abc", "def"] }],
-            "node": { "foo": ["bar"] },
-            "expected": { "foo": ["bar", ["abc", "def"]] }
+            "patch": [{ "op": "add", "path": "/foo/-", "value": ["abc", "def"] }],
+            "source": { "foo": ["bar"] },
+            "target": { "foo": ["bar", ["abc", "def"]] }
         }
     ]
 }

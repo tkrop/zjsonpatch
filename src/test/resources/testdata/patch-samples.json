@@ -2,8 +2,8 @@
     "**** no change operations ****",
     {
         "message": "empty patch if no changes",
-        "first": "a",
-        "second": "a",
+        "source": "a",
+        "target": "a",
         "patch": [ ]
     },
 
@@ -36,7 +36,7 @@
     "**** test operations ****",
     {
         "message": "test operation error for no such path in source",
-        "first": { },
+        "source": { },
         "patch": [
             { "op": "test", "path": "/a", "value": { } }
         ],
@@ -44,7 +44,7 @@
     },
     {
         "message": "test operation error for value differs from expectation",
-        "first": { "a": { } },
+        "source": { "a": { } },
         "patch": [
             { "op": "test", "path": "/a", "value": [ ] }
         ],
@@ -52,8 +52,8 @@
     },
     {
         "message": "test operation success",
-        "first": { "a": { } },
-        "second": { "a": { } },
+        "source": { "a": { } },
+        "target": { "a": { } },
         "patch": [
             { "op": "test", "path": "/a", "value": { } }
         ]
@@ -62,7 +62,7 @@
     "**** add operations ****",
     {
         "message": "add operation error for missing value field",
-        "first": { },
+        "source": { },
         "patch": [
             { "op": "add", "path": "/a" }
         ],
@@ -70,7 +70,7 @@
     },
     {
         "message": "add operation error for no such from path",
-        "first": { },
+        "source": { },
         "patch": [
             { "op": "add", "path": "/a/b", "value": "c" }
         ],
@@ -78,7 +78,7 @@
     },
     {
         "message": "add operation error for no such from path",
-        "first": [ ],
+        "source": [ ],
         "patch": [
             { "op": "add", "path": "/0/b", "value": "c" }
         ],
@@ -86,7 +86,7 @@
     },
     {
         "message": "add operation error for no such path",
-        "first": { "a": "b" },
+        "source": { "a": "b" },
         "patch": [
             { "op": "add", "path": "/a/b/c", "value": 1 }
         ],
@@ -94,7 +94,7 @@
     },
     {
         "message": "add operation error for not an index",
-        "first": [ ],
+        "source": [ ],
         "patch": [
             { "op": "add", "path": "/", "value": 1 }
         ],
@@ -102,7 +102,7 @@
     },
     {
         "message": "add operation error for positive index out of bounds",
-        "first": [ 1, 2 ],
+        "source": [ 1, 2 ],
         "patch": [
             { "op": "add", "path": "/3", "value": 1 }
         ],
@@ -110,7 +110,7 @@
     },
     {
         "message": "add operation error for negative index out of bounds",
-        "first": [ 1, 2 ],
+        "source": [ 1, 2 ],
         "patch": [
             { "op": "add", "path": "/-2", "value": 1 }
         ],
@@ -118,7 +118,7 @@
     },
     {
         "message": "add operation error for parent not container",
-        "first": { "a": "b" },
+        "source": { "a": "b" },
         "patch": [
             { "op": "add", "path": "/a/f", "value": "b" }
         ],
@@ -126,40 +126,40 @@
     },
     {
         "message": "add to replace object value with null",
-        "first": { },
-        "second": null,
+        "source": { },
+        "target": null,
         "patch": [
             { "op": "add", "path": "", "value": null }
         ]
     },
     {
         "message": "add to replace array value with object",
-        "first": [ ],
-        "second": { },
+        "source": [ ],
+        "target": { },
         "patch": [
             { "op": "add", "path": "", "value": { } }
         ]
     },
     {
         "message": "add empty property to object",
-        "first": {},
-        "second": { "": "a" },
+        "source": {},
+        "target": { "": "a" },
         "patch": [
             { "op": "add", "path": "/", "value": "a" }
         ]
     },
     {
         "message": "add property to object",
-        "first": {},
-        "second": { "a": "b" },
+        "source": {},
+        "target": { "a": "b" },
         "patch": [
             { "op": "add", "path": "/a", "value": "b" }
         ]
     },
     {
         "message": "add array members using special end-of-array pointer",
-        "first": [ 1, null, {}, true ],
-        "second": [ 1, null, {}, true, 4, 5 ],
+        "source": [ 1, null, {}, true ],
+        "target": [ 1, null, {}, true, 4, 5 ],
         "patch": [
             { "op": "add", "path": "/-", "value": 4 },
             { "op": "add", "path": "/-", "value": 5 }
@@ -167,8 +167,8 @@
     },
     {
         "message": "add object members in natural order",
-        "first": { "a": 1 },
-        "second": { "a": 1, "c": 2, "b": 3, "d": 4 },
+        "source": { "a": 1 },
+        "target": { "a": 1, "c": 2, "b": 3, "d": 4 },
         "patch": [
             { "op": "add", "path": "/b", "value": 3 },
             { "op": "add", "path": "/c", "value": 2 },
@@ -177,8 +177,8 @@
     },
     {
         "message": "add object support of path with /",
-        "first": { "b/c/d": [1, 2, 3] },
-        "second": { "b/c/d": [1, 2, 3, 4] },
+        "source": { "b/c/d": [1, 2, 3] },
+        "target": { "b/c/d": [1, 2, 3, 4] },
         "patch": [
             { "op": "add", "path": "/b~1c~1d/3", "value": 4 }
         ]
@@ -187,7 +187,7 @@
     "**** remove operations ****",
     {
         "message": "remove operation error for no such path in array",
-        "first": { "x": null },
+        "source": { "x": null },
         "patch": [
             { "op": "remove", "path": "/x/1" }
         ],
@@ -195,7 +195,7 @@
     },
     {
         "message": "remove operation error for no such from path",
-        "first": { "x": null },
+        "source": { "x": null },
         "patch": [
             { "op": "remove", "path": "/a/b" }
         ],
@@ -203,7 +203,7 @@
     },
     {
         "message": "remove operation error for no such path in array",
-        "first": { "x": [ "single" ] },
+        "source": { "x": [ "single" ] },
         "patch": [
             { "op": "remove", "path": "/x/1" }
         ],
@@ -211,7 +211,7 @@
     },
     {
         "message": "remove operation error for no such path",
-        "first": { "x": "just a string" },
+        "source": { "x": "just a string" },
         "patch": [
             { "op": "remove", "path": "/y" }
         ],
@@ -220,7 +220,7 @@
     },
     {
         "message": "remove operation error for no such path",
-        "first": { "x": {} },
+        "source": { "x": {} },
         "patch": [
             { "op": "remove", "path": "/x/y" }
         ],
@@ -229,32 +229,32 @@
     },
     {
         "message": "remove property value from object",
-        "first": { "x": { "a": "b", "y": {} } },
-        "second": { "x": { "a": "b" } },
+        "source": { "x": { "a": "b", "y": {} } },
+        "target": { "x": { "a": "b" } },
         "patch": [
             { "op": "remove", "path": "/x/y" }
         ]
     },
     {
         "message": "remove property value from array",
-        "first": [ [ "a", "b", "c"], "d", "e" ],
-        "second": [ [ "a", "b" ], "d", "e" ],
+        "source": [ [ "a", "b", "c"], "d", "e" ],
+        "target": [ [ "a", "b" ], "d", "e" ],
         "patch": [
             { "op": "remove", "path": "/0/2" }
         ]
     },
     {
         "message": "remove property value from array in object",
-        "first": { "x": [ "y", "z" ], "a": "b" },
-        "second": { "x": [ "z" ], "a": "b" },
+        "source": { "x": [ "y", "z" ], "a": "b" },
+        "target": { "x": [ "z" ], "a": "b" },
         "patch": [
             { "op": "remove", "path": "/x/0" }
         ]
     },
     {
         "message": "remove array members from array",
-        "first": [ 1, 2, 3 ],
-        "second": [ 1 ],
+        "source": [ 1, 2, 3 ],
+        "target": [ 1 ],
         "patch": [
             { "op": "remove", "path": "/1" },
             { "op": "remove", "path": "/1" }
@@ -262,8 +262,8 @@
     },
     {
         "message": "remove single object member",
-        "first": { "a": "b", "c": "d" },
-        "second": { "a": "b" },
+        "source": { "a": "b", "c": "d" },
+        "target": { "a": "b" },
         "patch": [
             { "op": "remove", "path": "/c" }
         ]
@@ -272,7 +272,7 @@
     "**** move operations ****",
     {
         "message": "move operation error for no such path",
-        "first": {},
+        "source": {},
         "patch": [
             { "op": "move", "path": "/a/b", "from": "/a" }
         ],
@@ -280,7 +280,7 @@
     },
     {
         "message": "move operation error for no such parent",
-        "first": { "a": "b" },
+        "source": { "a": "b" },
         "patch": [
             { "op": "move", "path": "/b/c", "from": "/a" }
         ],
@@ -288,7 +288,7 @@
     },
     {
         "message": "move operation error for missing from field",
-        "first": { "a": "b" },
+        "source": { "a": "b" },
         "patch": [
             { "op": "move", "path": "/b/c" }
         ],
@@ -296,7 +296,7 @@
     },
     {
         "message": "move operation error for no such from path",
-        "first": {},
+        "source": {},
         "patch": [
             { "op": "move", "path": "/a/b", "from": "/a" }
         ],
@@ -304,7 +304,7 @@
     },
     {
         "message": "move operation error for no such parent",
-        "first": { "a": "b" },
+        "source": { "a": "b" },
         "patch": [
             { "op": "move", "path": "/b/c", "from": "/a" }
         ],
@@ -312,7 +312,7 @@
     },
     {
         "message": "move operation for no such from path",
-        "first": { "x": { "a": "y" } },
+        "source": { "x": { "a": "y" } },
         "patch": [
             { "op": "move", "path": "/b/c", "from": "/a" }
         ],
@@ -320,32 +320,32 @@
     },
     {
         "message": "move to same position",
-        "first": { "x": { "a": "y" } },
-        "second": { "x": { "a": "y" } },
+        "source": { "x": { "a": "y" } },
+        "target": { "x": { "a": "y" } },
         "patch": [
             { "op": "move", "path": "/x/a", "from": "/x/a" }
         ]
     },
     {
         "message": "move value to new inner property",
-        "first": [ "a", {}, {} ],
-        "second": [ { "x": "a" }, {} ],
+        "source": [ "a", {}, {} ],
+        "target": [ { "x": "a" }, {} ],
         "patch": [
             { "op": "move", "path": "/0/x", "from": "/0" }
         ]
     },
     {
         "message": "move value using special end-of-array pointer",
-        "first": [ 0, 1, 2 ],
-        "second": [ 1, 2, 0 ],
+        "source": [ 0, 1, 2 ],
+        "target": [ 1, 2, 0 ],
         "patch": [
             { "op": "move", "path": "/-", "from": "/0" }
         ]
     },
     {
         "message": "move value into array",
-        "first": { "a": "c", "b": [ 1, 2, 3, 4 ] },
-        "second": { "b": [ 1, 2, "c", 3, 4 ] },
+        "source": { "a": "c", "b": [ 1, 2, 3, 4 ] },
+        "target": { "b": [ 1, 2, "c", 3, 4 ] },
         "patch": [
             { "op": "move", "path": "/b/2", "from": "/a" }
         ]
@@ -354,16 +354,16 @@
     "**** copy operations ****",
     {
         "message": "copy value from property",
-        "first": { "a": [ 0, 1 ] },
-        "second": { "a": [ 0, 1 ], "b": [ 0, 1 ] },
+        "source": { "a": [ 0, 1 ] },
+        "target": { "a": [ 0, 1 ], "b": [ 0, 1 ] },
         "patch": [
             { "op": "copy", "path": "/b", "from": "/a" }
         ]
     },
     {
         "message": "copy value from array position",
-        "first": [ [ 0, 1 ], 2, 3, 4 ],
-        "second": [ [ 0, 1 ], 2, 3, 4, [ 0, 1 ] ],
+        "source": [ [ 0, 1 ], 2, 3, 4 ],
+        "target": [ [ 0, 1 ], 2, 3, 4, [ 0, 1 ] ],
         "patch": [
             { "op": "copy", "path": "/-", "from": "/0" }
         ]
@@ -372,7 +372,7 @@
     "**** replace operations ****",
     {
         "message": "replace operation error for missing field value",
-        "first": { },
+        "source": { },
         "patch": [
             { "op": "replace", "path": "/a" }
         ],
@@ -380,7 +380,7 @@
     },
     {
         "message": "replace operation error for no such path",
-        "first": { "x": null },
+        "source": { "x": null },
         "patch": [
             { "op": "replace", "path": "/x/", "value": "y" }
         ],
@@ -388,7 +388,7 @@
     },
     {
         "message": "replace operation error for no such from path",
-        "first": { "x": null },
+        "source": { "x": null },
         "patch": [
             { "op": "replace", "path": "/a/b", "value": "y" }
         ],
@@ -396,56 +396,56 @@
     },
     {
         "message": "replace object against boolean",
-        "first": { "x": { "a": "b", "y": {} } },
-        "second": false,
+        "source": { "x": { "a": "b", "y": {} } },
+        "target": false,
         "patch": [
             { "op": "replace", "path": "", "value": false }
         ]
     },
     {
         "message": "replace property value object against string",
-        "first": { "x": { "a": "b", "y": {} } },
-        "second": { "x": { "a": "b", "y": "hello" } },
+        "source": { "x": { "a": "b", "y": {} } },
+        "target": { "x": { "a": "b", "y": "hello" } },
         "patch": [
             { "op": "replace", "path": "/x/y", "value": "hello" }
         ]
     },
     {
         "message": "replace array value against another",
-        "first": [ [ "a", "b", "c"], "d", "e" ],
-        "second": [ [ "a", "b", "x" ], "d", "e" ],
+        "source": [ [ "a", "b", "c"], "d", "e" ],
+        "target": [ [ "a", "b", "x" ], "d", "e" ],
         "patch": [
             { "op": "replace", "path": "/0/2", "value": "x" }
         ]
     },
     {
         "message": "replace array value against null",
-        "first": { "x": [ "y", "z" ], "a": "b" },
-        "second": { "x": [ null, "z" ], "a": "b" },
+        "source": { "x": [ "y", "z" ], "a": "b" },
+        "target": { "x": [ null, "z" ], "a": "b" },
         "patch": [
             { "op": "replace", "path": "/x/0", "value": null }
         ]
     },
     {
         "message": "replace single object value",
-        "first": { "a": null },
-        "second": { "a": 6 },
+        "source": { "a": null },
+        "target": { "a": 6 },
         "patch": [
             { "op": "replace", "path": "/a", "value": 6 }
         ]
     },
     {
         "message": "replace full value on root target",
-        "first": [ 1, 2, 3 ],
-        "second": { "a": "b" },
+        "source": [ 1, 2, 3 ],
+        "target": { "a": "b" },
         "patch": [
             { "op": "replace", "path": "", "value": { "a": "b" } }
         ]
     },
     {
         "message": "embedded object addition/replacement works",
-        "first": { "a": "b", "c": { "d": "e" } },
-        "second": { "a": "b", "c": { "d": 1, "e": "f" } },
+        "source": { "a": "b", "c": { "d": "e" } },
+        "target": { "a": "b", "c": { "d": 1, "e": "f" } },
         "patch": [
             { "op": "add", "path": "/c/e", "value": "f" },
             { "op": "replace", "path": "/c/d", "value": 1 }
@@ -453,8 +453,8 @@
     },
     {
         "message": "embedded array addition/replacement works",
-        "first": { "a": [ 1, 2, 3 ] },
-        "second": { "a": [ "b", 2, 3, 4 ] },
+        "source": { "a": [ 1, 2, 3 ] },
+        "target": { "a": [ "b", 2, 3, 4 ] },
         "patch": [
             { "op": "replace", "path": "/a/0", "value": "b" },
             { "op": "add", "path": "/a/-", "value": 4 }
@@ -462,8 +462,8 @@
     },
     {
         "message": "embedded object addition/replacement works (#2)",
-        "first": [ { "a": "b" }, "f", { "g": null } ],
-        "second": [ { "a": "b", "c": "d" }, "f", { "g": "h" } ],
+        "source": [ { "a": "b" }, "f", { "g": null } ],
+        "target": [ { "a": "b", "c": "d" }, "f", { "g": "h" } ],
         "patch": [
             { "op": "add", "path": "/0/c", "value": "d" },
             { "op": "replace", "path": "/2/g", "value": "h" }
@@ -471,8 +471,8 @@
     },
     {
         "message": "embedded array addition/replacement works (#2)",
-        "first": [ 1, [ 2, 3 ], 4 ],
-        "second": [ "x", [ 2, 3, "y" ], 4 ],
+        "source": [ 1, [ 2, 3 ], 4 ],
+        "target": [ "x", [ 2, 3, "y" ], 4 ],
         "patch": [
             { "op": "replace", "path": "/0", "value": "x" },
             { "op": "add", "path": "/1/-", "value": "y" }
@@ -482,8 +482,8 @@
     "**** compatibility operations ****",
     {
         "message": "add node with missing value null",
-        "first": { },
-        "second": { "a": null },
+        "source": { },
+        "target": { "a": null },
         "patch": [
             { "op": "add", "path": "a" }
         ],
@@ -491,8 +491,8 @@
     },
     {
         "message": "add node without missing value",
-        "first": { },
-        "second": { "a": "b" },
+        "source": { },
+        "target": { "a": "b" },
         "patch": [
             { "op": "add", "path": "a", "value": "b" }
         ],
@@ -500,8 +500,8 @@
     },
     {
         "message": "replace node with missing value null",
-        "first": { "a": "b" },
-        "second": { "a": null },
+        "source": { "a": "b" },
+        "target": { "a": null },
         "patch": [
             { "op": "replace", "path": "a" }
         ],
@@ -509,8 +509,8 @@
     },
     {
         "message": "replace in node with patch in place",
-        "first": { "a": "b" },
-        "second": { "a": null },
+        "source": { "a": "b" },
+        "target": { "a": null },
         "patch": [
             { "op": "replace", "path": "a", "value": null }
         ],
