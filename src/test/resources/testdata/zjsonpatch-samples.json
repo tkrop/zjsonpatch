@@ -388,19 +388,7 @@
         "target": {
             "a": 1,
             "b": 1
-        },
-        "patch": [
-            {
-                "op": "ADD",
-                "path": "[b]",
-                "value": 1
-            },
-            {
-                "op": "ADD",
-                "path": "[a]",
-                "value": 1
-            }
-        ]
+        }
     },
     {
         "source": {},

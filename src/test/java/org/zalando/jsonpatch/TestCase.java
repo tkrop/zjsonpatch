@@ -12,17 +12,73 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Set;
 
-import org.apache.commons.io.IOUtils;
 import org.zalando.jsonpatch.FeatureFlags;
 
 public class TestCase {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final ObjectNode node;
 
     private TestCase(ObjectNode node) {
         this.node = node;
+    }
+
+    public static Collection<TestCase> load(String file) throws IOException {
+        String path = "/testdata/" + file + ".json";
+        JsonNode tree = MAPPER.readTree(read(path));
+
+        List<TestCase> result = new ArrayList<TestCase>();
+        if (tree.isArray()) {
+            for (JsonNode node : tree) {
+                if (isEnabled(node)) {
+                    result.add(new TestCase((ObjectNode) node));
+                }
+            }
+        } else if (tree.isObject()) {
+            if (tree.has("errors")) {
+                for (JsonNode node : tree.get("errors")) {
+                    if (isEnabled(node)) {
+                        ((ObjectNode) node).putNull("error");
+                        result.add(new TestCase((ObjectNode) node));
+                    }
+                }
+            }
+            if (tree.has("ops")) {
+                for (JsonNode node : tree.get("ops")) {
+                    if (isEnabled(node)) {
+                        result.add(new TestCase((ObjectNode) node));
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    @SuppressWarnings("resource")
+    private static String read(String path) throws IOException {
+        InputStream stream = TestCase.class.getResourceAsStream(path);
+        try {
+            Scanner scanner = new Scanner(stream).useDelimiter("\\A");
+            try {
+                return scanner.hasNext() ? scanner.next() : "";
+            } finally {
+                scanner.close();
+            }
+        } finally {
+            stream.close();
+        }
+    }
+
+    private static boolean isEnabled(JsonNode node) {
+        if (!node.isObject()) {
+            return false;
+        }
+        JsonNode disabled = node.get("disabled");
+        return (disabled == null || disabled.isBoolean() && !disabled.booleanValue());
     }
 
     public boolean isOperation() {
@@ -63,49 +119,6 @@ public class TestCase {
             }
         }
         throw new IllegalArgumentException("flag not found [" + name + "]");
-    }
-
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-
-    public static Collection<TestCase> load(String file) throws IOException {
-        String path = "/testdata/" + file + ".json";
-        InputStream stream = TestCase.class.getResourceAsStream(path);
-        String date = IOUtils.toString(stream, "UTF-8");
-        JsonNode tree = MAPPER.readTree(date);
-
-        List<TestCase> result = new ArrayList<TestCase>();
-        if (tree.isArray()) {
-            for (JsonNode node : tree) {
-                if (isEnabled(node)) {
-                    result.add(new TestCase((ObjectNode) node));
-                }
-            }
-        } else if (tree.isObject()) {
-            if (tree.has("errors")) {
-                for (JsonNode node : tree.get("errors")) {
-                    if (isEnabled(node)) {
-                        ((ObjectNode) node).putNull("error");
-                        result.add(new TestCase((ObjectNode) node));
-                    }
-                }
-            }
-            if (tree.has("ops")) {
-                for (JsonNode node : tree.get("ops")) {
-                    if (isEnabled(node)) {
-                        result.add(new TestCase((ObjectNode) node));
-                    }
-                }
-            }
-        }
-        return result;
-    }
-
-    private static boolean isEnabled(JsonNode node) {
-        if (!node.isObject()) {
-            return false;
-        }
-        JsonNode disabled = node.get("disabled");
-        return (disabled == null || disabled.isBoolean() && !disabled.booleanValue());
     }
 
     @Override

@@ -41,9 +41,10 @@ final class JsonPatchHelper {
                     message.append('\t').append(suppressed.getMessage());
                 }
                 JsonPatchException except = new JsonPatchException(message.toString());
+                /* Java 1.7 extension
                 for (Exception suppressed : excepts) {
                     except.addSuppressed(suppressed);
-                }
+                } */
                 throw except;
         }
     }
