@@ -56,14 +56,14 @@ public final class JsonDiff {
     }
 
     private static JsonNode convert(ObjectNode node, Diff diff, Set<FeatureFlags> flags) {
-        node.put(Constants.OP, diff.getOp().getName());
-        node.put(Constants.PATH, JsonPathHelper.getPathRep(diff.getPath()));
-        if (JsonPatchOp.MOVE.equals(diff.getOp())) {
-            node.put(Constants.FROM, JsonPathHelper.getPathRep(diff.getPath()));
-            node.put(Constants.PATH, JsonPathHelper.getPathRep(diff.getToPath()));
-        } else if (!JsonPatchOp.REMOVE.equals(diff.getOp())) {
-            if (!diff.getValue().isNull() || !flags.contains(FeatureFlags.MISSING_VALUES_AS_NULLS)) {
-                node.set(Constants.VALUE, diff.getValue());
+        node.put(Constants.OP, diff.op.getName());
+        node.put(Constants.PATH, JsonPathHelper.getPathRep(diff.path));
+        if (JsonPatchOp.MOVE.equals(diff.op)) {
+            node.put(Constants.FROM, JsonPathHelper.getPathRep(diff.path));
+            node.put(Constants.PATH, JsonPathHelper.getPathRep(diff.from));
+        } else if (!JsonPatchOp.REMOVE.equals(diff.op)) {
+            if (!diff.value.isNull() || !flags.contains(FeatureFlags.MISSING_VALUES_AS_NULLS)) {
+                node.set(Constants.VALUE, diff.value);
             }
         }
         return node;
@@ -76,30 +76,14 @@ public final class JsonDiff {
         public final JsonNode value;
 
         public Diff(JsonPatchOp op, List<Object> path, JsonNode value) {
-            this(op, null, path, value);
+            this(op, path, null, value);
         }
 
         public Diff(JsonPatchOp op, List<Object> toPath, List<Object> fromPath, JsonNode value) {
             this.op = op;
-            this.path = fromPath;
-            this.from = toPath;
+            this.path = toPath;
+            this.from = fromPath;
             this.value = value;
-        }
-
-        public JsonPatchOp getOp() {
-            return op;
-        }
-
-        public List<Object> getPath() {
-            return path;
-        }
-
-        public JsonNode getValue() {
-            return value;
-        }
-
-        List<Object> getToPath() {
-            return from;
         }
     }
 
@@ -180,7 +164,7 @@ public final class JsonDiff {
                             queue(JsonPatchOp.REMOVE, path, node);
                         } else {
                             Diff diff = deque.remove();
-                            generate(diff.getPath(), node, diff.getValue());
+                            generate(diff.path, node, diff.value);
                         }
                     }
 
@@ -418,27 +402,27 @@ public final class JsonDiff {
                 Diff diff1 = diffs.get(i);
 
                 // if not remove OR add, move to next diff
-                if (!(JsonPatchOp.REMOVE.equals(diff1.getOp()) ||
-                        JsonPatchOp.ADD.equals(diff1.getOp()))) {
+                if (!(JsonPatchOp.REMOVE.equals(diff1.op) ||
+                        JsonPatchOp.ADD.equals(diff1.op))) {
                     continue;
                 }
 
                 for (int j = i + 1; j < diffs.size(); j++) {
                     Diff diff2 = diffs.get(j);
-                    if (!diff1.getValue().equals(diff2.getValue())) {
+                    if (!diff1.value.equals(diff2.value)) {
                         continue;
                     }
 
                     Diff moveDiff = null;
-                    if (JsonPatchOp.REMOVE.equals(diff1.getOp()) &&
-                            JsonPatchOp.ADD.equals(diff2.getOp())) {
-                        computeRelativePath(diff2.getPath(), i + 1, j - 1, diffs);
-                        moveDiff = new Diff(JsonPatchOp.MOVE, diff2.getPath(), diff1.getPath(), diff2.getValue());
+                    if (JsonPatchOp.REMOVE.equals(diff1.op) &&
+                            JsonPatchOp.ADD.equals(diff2.op)) {
+                        computeRelativePath(diff2.path, i + 1, j - 1, diffs);
+                        moveDiff = new Diff(JsonPatchOp.MOVE, diff1.path, diff2.path, diff2.value);
 
-                    } else if (JsonPatchOp.ADD.equals(diff1.getOp()) &&
-                            JsonPatchOp.REMOVE.equals(diff2.getOp())) {
-                        computeRelativePath(diff2.getPath(), i, j - 1, diffs); // diff1's add should also be considered
-                        moveDiff = new Diff(JsonPatchOp.MOVE, diff1.getPath(), diff2.getPath(), diff1.getValue());
+                    } else if (JsonPatchOp.ADD.equals(diff1.op) &&
+                            JsonPatchOp.REMOVE.equals(diff2.op)) {
+                        computeRelativePath(diff2.path, i, j - 1, diffs); // diff1's add should also be considered
+                        moveDiff = new Diff(JsonPatchOp.MOVE, diff2.path, diff1.path, diff1.value);
                     }
                     if (moveDiff != null) {
                         diffs.remove(j);
@@ -459,7 +443,7 @@ public final class JsonDiff {
             for (int i = startIdx; i <= endIdx; i++) {
                 Diff diff = diffs.get(i);
                 // Adjust relative path according to #Add and #Remove
-                if (JsonPatchOp.ADD.equals(diff.getOp()) || JsonPatchOp.REMOVE.equals(diff.getOp())) {
+                if (JsonPatchOp.ADD.equals(diff.op) || JsonPatchOp.REMOVE.equals(diff.op)) {
                     updatePath(path, diff, counters);
                 }
             }
@@ -484,28 +468,28 @@ public final class JsonDiff {
 
         private void updatePath(List<Object> path, Diff pseudo, List<Integer> counters) {
             // find longest common prefix of both the paths
-            if (pseudo.getPath().size() <= path.size()) {
+            if (pseudo.path.size() <= path.size()) {
                 int idx = -1;
-                for (int i = 0; i < pseudo.getPath().size() - 1; i++) {
-                    if (pseudo.getPath().get(i).equals(path.get(i))) {
+                for (int i = 0; i < pseudo.path.size() - 1; i++) {
+                    if (pseudo.path.get(i).equals(path.get(i))) {
                         idx = i;
                     } else {
                         break;
                     }
                 }
-                if (idx == pseudo.getPath().size() - 2) {
-                    if (pseudo.getPath().get(pseudo.getPath().size() - 1) instanceof Integer) {
-                        updateCounters(pseudo, pseudo.getPath().size() - 1, counters);
+                if (idx == pseudo.path.size() - 2) {
+                    if (pseudo.path.get(pseudo.path.size() - 1) instanceof Integer) {
+                        updateCounters(pseudo, pseudo.path.size() - 1, counters);
                     }
                 }
             }
         }
 
         private void updateCounters(Diff pseudo, int idx, List<Integer> counters) {
-            if (JsonPatchOp.ADD.equals(pseudo.getOp())) {
+            if (JsonPatchOp.ADD.equals(pseudo.op)) {
                 counters.set(idx, counters.get(idx) - 1);
             } else {
-                if (JsonPatchOp.REMOVE.equals(pseudo.getOp())) {
+                if (JsonPatchOp.REMOVE.equals(pseudo.op)) {
                     counters.set(idx, counters.get(idx) + 1);
                 }
             }

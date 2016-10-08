@@ -15,7 +15,7 @@ public final class JsonPatch {
     private static final EnumSet<FeatureFlags> DEFAULT = EnumSet.of(FeatureFlags.PATCH_OPTIMIZATION);
     private final Set<FeatureFlags> flags;
 
-    private static interface Processor {
+    protected static interface Processor {
         static final Noop NOOP = new Noop();
 
         /**
