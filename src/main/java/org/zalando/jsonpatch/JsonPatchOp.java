@@ -4,7 +4,7 @@ package org.zalando.jsonpatch;
  * User: gopi.vishwakarma
  * Date: 30/07/14
  */
-enum Operation {
+enum JsonPatchOp {
     ADD,
     REPLACE,
     REMOVE,
@@ -14,8 +14,8 @@ enum Operation {
 
     private final String name = this.name().toLowerCase().intern();
 
-    public static Operation fromRfcName(String name) throws JsonPatchException {
-        for (Operation  op : Operation.values()) {
+    public static JsonPatchOp fromRfcName(String name) throws JsonPatchException {
+        for (JsonPatchOp  op : JsonPatchOp.values()) {
             if (op.name.equalsIgnoreCase(name)) {
                 return op;
             }

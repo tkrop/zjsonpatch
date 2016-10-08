@@ -514,6 +514,6 @@
         "patch": [
             { "op": "replace", "path": "a", "value": null }
         ],
-        "flags": [ "ENABLE_PATCH_IN_PLACE" ]
+        "flags": [ "PATCH_IN_PLACE" ]
     }
 ]

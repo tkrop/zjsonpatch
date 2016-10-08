@@ -34,15 +34,13 @@ public class JsonPatchBenchmark {
     private static final int RUNS = 20;
     private static final int LOOPS = 40;
     private static final Set<FeatureFlags> FLAGS = //
-            EnumSet.of(FeatureFlags.ENABLE_ORIG_PATCH_GENERATOR);
+            EnumSet.of(FeatureFlags.LCS_ITERATE_PATCH_GENERATOR);
 
     @SuppressWarnings("unchecked")
     private static final Set<FeatureFlags>[] FLAGS_SET = new Set[] {
-            EnumSet.of(FeatureFlags.ENABLE_ORIG_PATCH_GENERATOR),
-            EnumSet.of(FeatureFlags.ENABLE_OPT_PATCH_GENERATOR),
-            EnumSet.of(FeatureFlags.ENABLE_OPT_PATCH_GENERATOR, FeatureFlags.DISABLE_PATCH_OPTIMIZATION),
-            EnumSet.of(FeatureFlags.ENABLE_FAST_PATCH_GENERATOR, FeatureFlags.DISABLE_PATCH_OPTIMIZATION),
-            EnumSet.of(FeatureFlags.ENABLE_SAME_PATCH_GENERATOR, FeatureFlags.DISABLE_PATCH_OPTIMIZATION)
+            EnumSet.of(FeatureFlags.LCS_VISIT_PATCH_GENERATOR, FeatureFlags.PATCH_OPTIMIZATION),
+            EnumSet.of(FeatureFlags.LCS_ITERATE_PATCH_GENERATOR, FeatureFlags.PATCH_OPTIMIZATION),
+            EnumSet.of(FeatureFlags.SIMPLE_COMPARE_PATCH_GENERATOR, FeatureFlags.PATCH_OPTIMIZATION)
     };
 
     private static final String[] TOUR_PROPS =

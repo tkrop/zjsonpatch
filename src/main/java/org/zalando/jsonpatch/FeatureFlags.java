@@ -1,8 +1,5 @@
 package org.zalando.jsonpatch;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 /**
  * Flags for enabling and disabling features.
  */
@@ -15,34 +12,25 @@ public enum FeatureFlags {
     /**
      * Allows to patch the JSON Object instead of applying the patched on a deep copy.
      */
-    ENABLE_PATCH_IN_PLACE,
+    PATCH_IN_PLACE,
 
     /**
-     * Disable optimization of patch creation.
+     * Enable optimization of patch creation.
      */
-    DISABLE_PATCH_OPTIMIZATION,
+    PATCH_OPTIMIZATION,
 
     /**
-     * Enable fast patch generator.
+     * Enable longest common sequence (LCS) visitor patch generator.
      */
-    ENABLE_FAST_PATCH_GENERATOR,
+    LCS_VISIT_PATCH_GENERATOR,
 
     /**
-     * Enable optimized patch generator.
+     * Enable longest common sequence (LCS) iterator patch generator.
      */
-    ENABLE_OPT_PATCH_GENERATOR,
+    LCS_ITERATE_PATCH_GENERATOR,
 
     /**
-     * Enable original patch generator.
+     * Enable simple array compare patch generator.
      */
-    ENABLE_ORIG_PATCH_GENERATOR,
-
-    /**
-     * Enable same patch generator.
-     */
-    ENABLE_SAME_PATCH_GENERATOR;
-
-    public static Set<FeatureFlags> defaults() {
-        return EnumSet.noneOf(FeatureFlags.class);
-    }
+    SIMPLE_COMPARE_PATCH_GENERATOR;
 }
