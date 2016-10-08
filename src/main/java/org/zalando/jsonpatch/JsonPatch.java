@@ -12,46 +12,81 @@ import java.util.List;
 import java.util.Set;
 
 public final class JsonPatch {
+
+    /**
+     * Default set of feature flags for JSON Patch application.
+     */
     private static final EnumSet<FeatureFlags> DEFAULT = EnumSet.of(FeatureFlags.PATCH_OPTIMIZATION);
+    
+    /**
+     * Set of feature flags for patch application.
+     */
     private final Set<FeatureFlags> flags;
 
+    /**
+     * JSON Patch processor.
+     */
     protected static interface Processor {
+        /**
+         * Singleton no operation JSON patch processor.
+         */
         static final Noop NOOP = new Noop();
 
         /**
          * A processor for validation and testing.
          */
         public class Noop implements Processor {
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public JsonNode add(List<String> path, JsonNode value) {
                 return null;
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public JsonNode test(List<String> path, JsonNode value) {
                 return null;
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public JsonNode replace(List<String> path, JsonNode value) {
                 return null;
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public JsonNode remove(List<String> path) {
                 return null;
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public JsonNode move(List<String> fromPath, List<String> toPath) {
                 return null;
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public JsonNode copy(List<String> fromPath, List<String> toPath) {
                 return null;
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public JsonNode result() {
                 return null;
@@ -59,18 +94,26 @@ public final class JsonPatch {
         }
 
         class Apply implements Processor {
-
+            /**
+             * Target JSON document.
+             */
             private JsonNode target;
 
             Apply(JsonNode target) {
                 this.target = target;
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public JsonNode result() {
                 return target;
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public JsonNode add(List<String> path, JsonNode value) {
                 JsonNode parent = getParent(path);
@@ -112,6 +155,9 @@ public final class JsonPatch {
                 target.set(key, value);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public JsonNode test(List<String> path, JsonNode value) {
                 JsonNode node = getNode(target, path, 1);
@@ -126,6 +172,9 @@ public final class JsonPatch {
                 return value;
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public JsonNode replace(List<String> path, JsonNode value) {
                 JsonNode parent = getParent(path);
@@ -147,6 +196,9 @@ public final class JsonPatch {
                 return value;
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public JsonNode remove(List<String> path) {
                 JsonNode parent = getParent(path);
@@ -164,11 +216,17 @@ public final class JsonPatch {
                         "no such path in source (path: " + JsonPathHelper.toString(path) + ")");
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public JsonNode move(List<String> fromPath, List<String> toPath) {
                 return add(toPath, remove(fromPath));
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public JsonNode copy(List<String> fromPath, List<String> toPath) {
                 return add(toPath, getNode(target, fromPath, 1));
@@ -282,7 +340,7 @@ public final class JsonPatch {
     }
 
     private void patch(Processor processor, JsonNode patch) {
-        JsonPatchOp operation = JsonPatchOp.fromRfcName(Helper.getPatchAttr(patch, Constants.OP).asText());
+        JsonPatchOpType operation = JsonPatchOpType.fromRfcName(Helper.getPatchAttr(patch, Constants.OP).asText());
         List<String> path = JsonPathHelper.getPath(Helper.getPatchAttr(patch, Constants.PATH).asText());
 
         switch (operation) {

@@ -15,7 +15,7 @@ public enum FeatureFlags {
     PATCH_IN_PLACE,
 
     /**
-     * Enable optimization of patch creation.
+     * Enable general patch optimization.
      */
     PATCH_OPTIMIZATION,
 
