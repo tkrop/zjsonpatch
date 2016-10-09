@@ -1,117 +1,122 @@
 [
     {
         "message": "compare object to object",
-        "first": { },
-        "second": { },
+        "source": { },
+        "target": { },
         "patch": [ ]
     },
     {
         "message": "compare object to array",
-        "first": { },
-        "second": [ ],
+        "source": { },
+        "target": [ ],
         "patch": [ 
             { "op": "replace", "path": "", "value": [ ] }
         ]
     },
     {
         "message": "compare array to object",
-        "first": [ ],
-        "second": { },
+        "source": [ ],
+        "target": { },
         "patch": [ 
             { "op": "replace", "path": "", "value": { } }
         ]
     },
     {
         "message": "compare array to array",
-        "first": [ ],
-        "second": [ ],
+        "source": [ ],
+        "target": [ ],
         "patch": [ ]
     },
     {
         "message": "add property",
-        "first": { },
-        "second": { "a": "b" },
+        "source": { },
+        "target": { "a": "b" },
         "patch": [
             { "op": "add", "path": "/a", "value": "b" }
         ]
     },
     {
         "message": "removed property",
-        "first": { "a": "b" },
-        "second": { },
+        "source": { "a": "b" },
+        "target": { },
         "patch": [
             { "op": "remove", "path": "/a" }
         ]
     },
     {
-        "message": "replaced property value",
-        "first": { "a": "b" },
-        "second": { "a": "c" },
+        "message": "replaced property value uing replace",
+        "source": { "a": "b" },
+        "target": { "a": "c" },
         "patch": [
             { "op": "replace", "path": "/a", "value": "c" }
         ]
     },
     {
-        "message": "replaced property",
-        "first": { "a": 1 },
-        "second": { "b": 2 },
+        "message": "replaced property using remove and add",
+        "source": { "a": 1 },
+        "target": { "b": 2 },
         "patch": [
             { "op": "remove", "path": "/a" },
             { "op": "add", "path": "/b", "value": 2 }
         ]
     },
     {
-        "message": "replace property key",
-        "first": { "a": 0.1 },
-        "second": { "b": 0.1 },
+        "message": "replace property key using move",
+        "source": { "a": 0.1 },
+        "target": { "b": 0.1 },
         "patch": [
             { "op": "move", "path": "/b", "from": "/a" }
-        ]
+        ],
+        "disabled": [ "SIMPLE_COMPARE_PATCH_GENERATOR" ]
     },
     {
-        "message": "add array value",
-        "first": [ ],
-        "second": [ "a" ],
+        "message": "add array value using add",
+        "source": [ ],
+        "target": [ "a" ],
         "patch": [
             { "op": "add", "path": "/0", "value": "a" }
         ]
     },
     {
-        "message": "replace array value",
-        "first": [ "hello", "world" ],
-        "second": [ "hello", "world!" ],
+        "message": "replace array value using replace",
+        "source": [ "hello", "world" ],
+        "target": [ "hello", "world!" ],
         "patch": [
             { "op": "replace", "path": "/1", "value": "world!" }
         ]
     },
+
+    "**** array operations *****",
     {
-        "message": "same arrays",
-        "first": [ 1, 2, 3 ],
-        "second": [ 1, 2, 3 ],
+        "message": "empty patch for same arrays",
+        "source": [ 1, 2, 3 ],
+        "target": [ 1, 2, 3 ],
         "patch": [ ]
     },
     {
         "message": "arrays where first has additional values at begin",
-        "first": [ 0, 1, 2, 3 ],
-        "second": [ 2, 3 ],
+        "source": [ 0, 1, 2, 3 ],
+        "target": [ 2, 3 ],
         "patch": [
             { "op": "remove", "path": "/0" },
             { "op": "remove", "path": "/0" }
-        ]
+        ],
+        "disabled": [ "SIMPLE_COMPARE_PATCH_GENERATOR" ]
     },
     {
         "message": "arrays where second has additional values at begin",
-        "first": [ 2, 3 ],
-        "second": [ 0, 1, 2, 3 ],
+        "source": [ 2, 3 ],
+        "target": [ 0, 1, 2, 3 ],
         "patch": [
             { "op": "add", "path": "/0", "value": 0 },
             { "op": "add", "path": "/1", "value": 1 }
-        ]
+        ],
+        "disabled": [ "SIMPLE_COMPARE_PATCH_GENERATOR" ]
     },
     {
         "message": "arrays where first has additional values at end",
-        "first": [ 0, 1, 2, 3 ],
-        "second": [ 0, 1 ],
+        "source": [ 0, 1, 2, 3 ],
+        "target": [ 0, 1 ],
         "patch": [
             { "op": "remove", "path": "/2" },
             { "op": "remove", "path": "/2" }
@@ -119,8 +124,8 @@
     },
     {
         "message": "arrays where second has additional values at end",
-        "first": [ 0, 1 ],
-        "second": [ 0, 1, 2, 3 ],
+        "source": [ 0, 1 ],
+        "target": [ 0, 1, 2, 3 ],
         "patch": [
             { "op": "add", "path": "/2", "value": 2 },
             { "op": "add", "path": "/3", "value": 3 }
@@ -128,44 +133,48 @@
     },
     {
        "message": "arrays where first has additional values in middle",
-       "first": [ 0, 1, 2, 3, 4, 5 ],
-       "second": [ 0, 1, 4, 5 ],
+       "source": [ 0, 1, 2, 3, 4, 5 ],
+       "target": [ 0, 1, 4, 5 ],
        "patch": [
            { "op": "remove", "path": "/2" },
            { "op": "remove", "path": "/2" }
-        ]
+        ],
+        "disabled": [ "SIMPLE_COMPARE_PATCH_GENERATOR" ]
     },
     {
         "message": "arrays where second has additional values in middle",
-        "first": [ 0, 1, 4, 5 ],
-        "second": [ 0, 1, 2, 3, 4, 5 ],
+        "source": [ 0, 1, 4, 5 ],
+        "target": [ 0, 1, 2, 3, 4, 5 ],
         "patch": [
             { "op": "add", "path": "/2", "value": 2 },
             { "op": "add", "path": "/3", "value": 3 }
-        ]
+        ],
+        "disabled": [ "SIMPLE_COMPARE_PATCH_GENERATOR" ]
     },
     {
         "message": "move value from begin to end",
-        "first": [ 0, 1, 2 ],
-        "second": [ 1, 2, 0 ],
+        "source": [ 0, 1, 2 ],
+        "target": [ 1, 2, 0 ],
         "patch": [
             { "op": "move", "path": "/2", "from": "/0" }
-        ]
+        ],
+        "disabled": [ "SIMPLE_COMPARE_PATCH_GENERATOR" ]
     },
     {
         "message": "cover lots of array things example (TODO: separate)",
-        "first": { "b": [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ] },
-        "second": { "b": [ 1, 6, 2, 3, 5, 7, 0, 8 ], "c": 4 },
+        "source": { "b": [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ] },
+        "target": { "b": [ 1, 6, 2, 3, 5, 7, 0, 8 ], "c": 4 },
         "patch": [
             { "op": "move", "path": "/b/7", "from": "/b/0" },
             { "op": "move", "path":"/b/1", "from": "/b/5" },
             { "op": "move", "path": "/c", "from": "/b/4" }
-        ]
+        ],
+        "disabled": [ "SIMPLE_COMPARE_PATCH_GENERATOR" ]
     },
     {
         "message": "cover lots of object things example (TODO: separate)",
-        "first": { "a": [ { "a" : 0 }, { "c": 1 }, { "f": 3 }, { "g": 4, "h": { "j": 6 } } ] },
-        "second": { "a": [ { "c": 1, "d": { "e": 2 } }, { "f": 3 }, { "g": 4, "h": { "i": 5, "j": 6 } }, { "k": 7 } ], "l": 8 },
+        "source": { "a": [ { "a" : 0 }, { "c": 1 }, { "f": 3 }, { "g": 4, "h": { "j": 6 } } ] },
+        "target": { "a": [ { "c": 1, "d": { "e": 2 } }, { "f": 3 }, { "g": 4, "h": { "i": 5, "j": 6 } }, { "k": 7 } ], "l": 8 },
         "patch": [
             { "op": "remove", "path": "/a/0/a" },
             { "op": "add", "path": "/a/0/c", "value": 1 },
@@ -174,6 +183,7 @@
             { "op": "add", "path": "/a/2/h/i", "value": 5 },
             { "op": "add", "path": "/a/3", "value": { "k": 7 } },
             { "op": "add", "path": "/l", "value":8 }
-        ]
+        ],
+        "disabled": [ "SIMPLE_COMPARE_PATCH_GENERATOR" ]
     }
 ]

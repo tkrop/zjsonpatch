@@ -3,11 +3,14 @@ package org.zalando.jsonpatch;
 import java.util.ArrayList;
 import java.util.List;
 
-class JsonPathHelper {
+/**
+ * JSON path helper.
+ */
+abstract class PathHelper {
     /**
-     * Convert patch specific path array to path string.
+     * Convert patch application specific path array to path string.
      * 
-     * @param path patch specific path array.
+     * @param path patch application specific path array.
      * 
      * @return path string.
      */
@@ -46,9 +49,9 @@ class JsonPathHelper {
     }
 
     /**
-     * Extend given patch specific path array with given path segment key.
+     * Extend given patch application specific path array with given path segment key.
      * 
-     * @param path patch specific path array.
+     * @param path patch application specific path array.
      * @param key path segment key.
      * 
      * @return extended patch specific path array.
@@ -61,9 +64,9 @@ class JsonPathHelper {
     }
 
     /**
-     * Convert given diff specific path array into path string.
+     * Convert given patch creation specific path array into path string.
      * 
-     * @param path diff specific path array.
+     * @param path patch creation specific path array.
      * 
      * @return path string.
      */

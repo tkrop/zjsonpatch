@@ -51,6 +51,15 @@
         "error": "JsonPatchException: [test] value differs from expectations (path: /a | value: [] | node: {})"
     },
     {
+        "message": "test operation error for value differs from expectation multiple times",
+        "source": { "a": { }, "b": [ ] },
+        "patch": [
+            { "op": "test", "path": "/a", "value": [ ] },
+            { "op": "test", "path": "/b", "value": { } }
+        ],
+        "error": "JsonPatchException: invalid patch\n\t[test] value differs from expectations (path: /a | value: [] | node: {})\n\t\t=> applying patch/0: {\"op\":\"test\",\"path\":\"/a\",\"value\":[]}\n\t[test] value differs from expectations (path: /b | value: {} | node: [])\n\t\t=> applying patch/1: {\"op\":\"test\",\"path\":\"/b\",\"value\":{}}"
+    },
+    {
         "message": "test operation success",
         "source": { "a": { } },
         "target": { "a": { } },
@@ -506,14 +515,5 @@
             { "op": "replace", "path": "a" }
         ],
         "flags": [ "MISSING_VALUES_AS_NULLS" ]
-    },
-    {
-        "message": "replace in node with patch in place",
-        "source": { "a": "b" },
-        "target": { "a": null },
-        "patch": [
-            { "op": "replace", "path": "a", "value": null }
-        ],
-        "flags": [ "PATCH_IN_PLACE" ]
     }
 ]

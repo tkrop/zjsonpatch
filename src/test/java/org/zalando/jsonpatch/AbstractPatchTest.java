@@ -1,20 +1,17 @@
 package org.zalando.jsonpatch;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
-import org.zalando.jsonpatch.FeatureFlags;
-import org.zalando.jsonpatch.JsonPatch;
+
+import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-
-import java.util.Set;
 
 @RunWith(Parameterized.class)
 public abstract class AbstractPatchTest {
@@ -24,26 +21,28 @@ public abstract class AbstractPatchTest {
 
     private JsonNode operation(JsonNode source, JsonNode target, JsonNode patch) {
         Set<FeatureFlags> flags = p.getFlags();
-        if (flags == null) {
+        if (flags == null || flags.isEmpty()) {
             if (patch == null && target != null) {
-                patch = JsonDiff.asJson(source, target);
+                patch = JsonPatch.create(source, target);
             }
             JsonPatch.validate(patch);
-            return JsonPatch.apply(patch, source);
+            return JsonPatch.apply(patch, source.deepCopy());
         }
         if (patch == null && target != null) {
-            patch = JsonDiff.asJson(source, target, flags);
+            patch = JsonPatch.create(source, target, flags);
         }
         JsonPatch.validate(patch, flags);
-        return JsonPatch.apply(patch, source, flags);
+        return JsonPatch.apply(patch, source.deepCopy(), flags);
     }
 
     @Test
     public void test() throws Exception {
-        if (p.isOperation()) {
-            testOpertaion();
-        } else {
-            testError();
+        if (p.isEnabled()) {
+            if (p.isOperation()) {
+                testOpertaion();
+            } else {
+                testError();
+            }
         }
     }
 

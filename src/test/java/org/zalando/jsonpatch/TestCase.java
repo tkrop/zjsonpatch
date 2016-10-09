@@ -34,14 +34,14 @@ public class TestCase {
         List<TestCase> result = new ArrayList<TestCase>();
         if (tree.isArray()) {
             for (JsonNode node : tree) {
-                if (isEnabled(node)) {
+                if (node.isObject()) {
                     result.add(new TestCase((ObjectNode) node));
                 }
             }
         } else if (tree.isObject()) {
             if (tree.has("errors")) {
                 for (JsonNode node : tree.get("errors")) {
-                    if (isEnabled(node)) {
+                    if (node.isObject()) {
                         ((ObjectNode) node).putNull("error");
                         result.add(new TestCase((ObjectNode) node));
                     }
@@ -49,7 +49,7 @@ public class TestCase {
             }
             if (tree.has("ops")) {
                 for (JsonNode node : tree.get("ops")) {
-                    if (isEnabled(node)) {
+                    if (node.isObject()) {
                         result.add(new TestCase((ObjectNode) node));
                     }
                 }
@@ -73,12 +73,22 @@ public class TestCase {
         }
     }
 
-    private static boolean isEnabled(JsonNode node) {
-        if (!node.isObject()) {
-            return false;
-        }
+    public boolean isEnabled() {
         JsonNode disabled = node.get("disabled");
-        return (disabled == null || disabled.isBoolean() && !disabled.booleanValue());
+        if (disabled == null) {
+            return true;
+        } else if (disabled.isBoolean()) {
+            return !disabled.booleanValue();
+        } else if (disabled.isArray()) {
+            Set<FeatureFlags> flags = getFlags();
+            for (FeatureFlags flag : parseFlags(disabled)) {
+                if (flags != null && flags.contains(flag)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     public boolean isOperation() {
@@ -90,6 +100,9 @@ public class TestCase {
     }
 
     public TestCase addFalgs(Set<FeatureFlags> flags) {
+        if (flags == null) {
+            return this;
+        }
         ArrayNode tflags = (ArrayNode) node.get("flags");
         if (tflags == null) {
             tflags = node.putArray("flags");
@@ -101,18 +114,23 @@ public class TestCase {
     }
 
     public Set<FeatureFlags> getFlags() {
-        Set<FeatureFlags> flags = new HashSet<FeatureFlags>();
         if (node.has("flags")) {
-            for (JsonNode name : node.get("flags")) {
-                if (name != null && name.isTextual()) {
-                    flags.add(getFlag(name.asText()));
-                }
-            }
+            return parseFlags(node.get("flags"));
         }
-        return flags.isEmpty() ? null : EnumSet.copyOf(flags);
+        return null;
     }
 
-    private FeatureFlags getFlag(String name) {
+    private Set<FeatureFlags> parseFlags(JsonNode node) {
+        Set<FeatureFlags> flags = new HashSet<FeatureFlags>();
+        for (JsonNode name : node) {
+            if (name != null && name.isTextual()) {
+                flags.add(parseFlag(name.asText()));
+            }
+        }
+        return (!flags.isEmpty()) ? EnumSet.copyOf(flags) : null;
+    }
+
+    private FeatureFlags parseFlag(String name) {
         for (FeatureFlags flag : FeatureFlags.values()) {
             if (flag.name().equalsIgnoreCase(name)) {
                 return flag;
@@ -128,10 +146,13 @@ public class TestCase {
             builder.append(node.get("message").asText());
         }
         if (node.has("flags")) {
-            if (builder.length() != 0) {
-                builder.append(' ');
+            Set<FeatureFlags> flags = getFlags();
+            if (flags != null) {
+                if (builder.length() != 0) {
+                    builder.append(' ');
+                }
+                builder.append(flags.toString());
             }
-            builder.append(getFlags().toString());
         }
         if (builder.length() == 0) {
             builder.append(super.toString());

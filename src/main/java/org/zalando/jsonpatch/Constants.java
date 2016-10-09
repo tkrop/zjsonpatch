@@ -1,14 +1,26 @@
 package org.zalando.jsonpatch;
 
 /**
- * Created with IntelliJ IDEA.
- * User: gopi.vishwakarma
- * Date: 10/07/15
- * Time: 10:35 AM
+ * Field names of JSON Patch attributes.
  */
-final class Constants {
+abstract class Constants {
+    /**
+     * Patch operation type field name.
+     */
     public static String OP = "op";
+
+    /**
+     * Patch operation value field name.
+     */
     public static String VALUE = "value";
+
+    /**
+     * Patch operation path field name.
+     */
     public static String PATH = "path";
+
+    /**
+     * Patch operation from field name (used for move).
+     */
     public static String FROM = "from";
 }

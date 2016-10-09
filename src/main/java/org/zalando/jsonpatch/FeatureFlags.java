@@ -1,23 +1,26 @@
 package org.zalando.jsonpatch;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
+import java.util.Set;
+
 /**
  * Flags for enabling and disabling features.
  */
 public enum FeatureFlags {
-    /**
-     * Represent nulls as missing values and vice versa.
-     */
-    MISSING_VALUES_AS_NULLS,
 
     /**
-     * Allows to patch the JSON Object instead of applying the patched on a deep copy.
-     */
-    PATCH_IN_PLACE,
-
-    /**
-     * Enable general patch optimization.
+     * Enable general patch optimization feature after creating a patch via {@link JsonDiff#create(JsonNode, JsonNode)}
+     * or {@link JsonDiff#create(JsonNode, JsonNode, Set)}.
      */
     PATCH_OPTIMIZATION,
+
+    /**
+     * Enable representation of nulls as missing values and vice versa, when creating or applying patches via
+     * {@link JsonDiff#create(JsonNode, JsonNode)}, {@link JsonDiff#create(JsonNode, JsonNode, Set)},
+     * {@link JsonPatch#apply(JsonNode, JsonNode)}, or {@link JsonPatch#apply(JsonNode, JsonNode, Set))}.
+     */
+    MISSING_VALUES_AS_NULLS,
 
     /**
      * Enable longest common sequence (LCS) visitor patch generator.

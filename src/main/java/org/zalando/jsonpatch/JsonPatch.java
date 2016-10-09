@@ -2,430 +2,142 @@ package org.zalando.jsonpatch;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.NullNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-public final class JsonPatch {
+import static org.zalando.jsonpatch.Constants.FROM;
+import static org.zalando.jsonpatch.Constants.OP;
+import static org.zalando.jsonpatch.Constants.PATH;
+import static org.zalando.jsonpatch.Constants.VALUE;
+import static org.zalando.jsonpatch.FeatureFlags.LCS_ITERATE_PATCH_GENERATOR;
+import static org.zalando.jsonpatch.FeatureFlags.LCS_VISIT_PATCH_GENERATOR;
+import static org.zalando.jsonpatch.FeatureFlags.MISSING_VALUES_AS_NULLS;
+import static org.zalando.jsonpatch.FeatureFlags.PATCH_OPTIMIZATION;
+import static org.zalando.jsonpatch.FeatureFlags.SIMPLE_COMPARE_PATCH_GENERATOR;
+import static org.zalando.jsonpatch.OpType.MOVE;
+import static org.zalando.jsonpatch.OpType.REMOVE;
+import static org.zalando.jsonpatch.Processor.NOOP;
+
+/**
+ * Entry point to create and apply a JSON Patches from given source and target JSON nodes. The {@link FeatureFlags} can
+ * be used to control the behavior of the patch generation. The default setting uses the standard longest common
+ * sequence patch generator together with general patch optimization. For special cases their are faster algorithm, that
+ * can be enabled to speed up patch generation.
+ */
+public abstract class JsonPatch {
 
     /**
-     * Default set of feature flags for JSON Patch application.
+     * Default set of feature flags for JSON Patch creation and application.
      */
-    private static final EnumSet<FeatureFlags> DEFAULT = EnumSet.of(FeatureFlags.PATCH_OPTIMIZATION);
-    
-    /**
-     * Set of feature flags for patch application.
-     */
-    private final Set<FeatureFlags> flags;
+    private static final EnumSet<FeatureFlags> DEFAULT = EnumSet.of(PATCH_OPTIMIZATION);
 
     /**
-     * JSON Patch processor.
+     * Create patch generator using given set of feature flags.
+     * 
+     * @param flags set of feature flags.
+     * 
+     * @return patch generator.
      */
-    protected static interface Processor {
-        /**
-         * Singleton no operation JSON patch processor.
-         */
-        static final Noop NOOP = new Noop();
-
-        /**
-         * A processor for validation and testing.
-         */
-        public class Noop implements Processor {
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public JsonNode add(List<String> path, JsonNode value) {
-                return null;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public JsonNode test(List<String> path, JsonNode value) {
-                return null;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public JsonNode replace(List<String> path, JsonNode value) {
-                return null;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public JsonNode remove(List<String> path) {
-                return null;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public JsonNode move(List<String> fromPath, List<String> toPath) {
-                return null;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public JsonNode copy(List<String> fromPath, List<String> toPath) {
-                return null;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public JsonNode result() {
-                return null;
-            }
+    private static Generator create(final Set<FeatureFlags> flags) {
+        if (flags.contains(LCS_ITERATE_PATCH_GENERATOR)) {
+            return new Generator.Lcs.Iterate(flags);
+        } else if (flags.contains(LCS_VISIT_PATCH_GENERATOR)) {
+            return new Generator.Lcs.Visit(flags);
+        } else if (flags.contains(SIMPLE_COMPARE_PATCH_GENERATOR)) {
+            return new Generator.Compare(flags);
         }
-
-        class Apply implements Processor {
-            /**
-             * Target JSON document.
-             */
-            private JsonNode target;
-
-            Apply(JsonNode target) {
-                this.target = target;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public JsonNode result() {
-                return target;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public JsonNode add(List<String> path, JsonNode value) {
-                JsonNode parent = getParent(path);
-                if (parent == null) {
-                    throw new JsonPatchException(
-                            "no such path in source (path: " + JsonPathHelper.toString(path) + ")");
-                }
-                String field = path.get(path.size() - 1);
-                if (field.isEmpty() && path.size() == 1) {
-                    target = value;
-                } else if (!parent.isContainerNode()) {
-                    throw new JsonPatchException(
-                            "parent is not a container in source (path: " + JsonPathHelper.toString(path)
-                                    + " | node: " + parent + ")");
-                } else if (parent.isArray()) {
-                    addToArray(path, value, parent);
-                } else {
-                    addToObject(path, parent, value);
-                }
-                return value;
-            }
-
-            private void addToArray(List<String> path, JsonNode value, JsonNode parent) {
-                final ArrayNode target = (ArrayNode) parent;
-                String idxStr = path.get(path.size() - 1);
-
-                if ("-".equals(idxStr)) {
-                    // see http://tools.ietf.org/html/rfc6902#section-4.1
-                    target.add(value);
-                } else {
-                    int idx = arrayIndex(idxStr, target.size(), path);
-                    target.insert(idx, value);
-                }
-            }
-
-            private void addToObject(List<String> path, JsonNode node, JsonNode value) {
-                final ObjectNode target = (ObjectNode) node;
-                String key = path.get(path.size() - 1);
-                target.set(key, value);
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public JsonNode test(List<String> path, JsonNode value) {
-                JsonNode node = getNode(target, path, 1);
-                if (node == null) {
-                    throw new JsonPatchException(
-                            "no such path in source (path: " + JsonPathHelper.toString(path) + ")");
-                } else if (!node.equals(value)) {
-                    throw new JsonPatchException(
-                            "value differs from expectations (path: " + JsonPathHelper.toString(path)
-                                    + " | value: " + value + " | node: " + node + ")");
-                }
-                return value;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public JsonNode replace(List<String> path, JsonNode value) {
-                JsonNode parent = getParent(path);
-                if (parent == null) {
-                    throw new JsonPatchException(
-                            "no such path in source (path: " + JsonPathHelper.toString(path) + ")");
-                }
-                String field = path.get(path.size() - 1);
-                if (field.isEmpty() && path.size() == 1) {
-                    target = value;
-                } else if (parent.isObject()) {
-                    ((ObjectNode) parent).set(field, value);
-                } else if (parent.isArray()) {
-                    ((ArrayNode) parent).set(arrayIndex(field, parent.size() - 1, path), value);
-                } else {
-                    throw new JsonPatchException(
-                            "no such path in source (path: " + JsonPathHelper.toString(path) + ")");
-                }
-                return value;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public JsonNode remove(List<String> path) {
-                JsonNode parent = getParent(path);
-                if (parent == null) {
-                    throw new JsonPatchException(
-                            "no such path in source (path: " + JsonPathHelper.toString(path) + ")");
-                }
-                String field = path.get(path.size() - 1);
-                if (parent.isObject()) {
-                    return ((ObjectNode) parent).remove(field);
-                } else if (parent.isArray()) {
-                    return ((ArrayNode) parent).remove(arrayIndex(field, parent.size() - 1, path));
-                }
-                throw new JsonPatchException(
-                        "no such path in source (path: " + JsonPathHelper.toString(path) + ")");
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public JsonNode move(List<String> fromPath, List<String> toPath) {
-                return add(toPath, remove(fromPath));
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public JsonNode copy(List<String> fromPath, List<String> toPath) {
-                return add(toPath, getNode(target, fromPath, 1));
-            }
-
-            private JsonNode getParent(List<String> path) {
-                return getNode(target, path.subList(0, path.size() - 1), 1);
-            }
-
-            private JsonNode getNode(JsonNode node, List<String> path, int index) {
-                if (index >= path.size()) {
-                    return node;
-                }
-                String key = path.get(index);
-                if (node.isArray()) {
-                    int keyInt = Integer.parseInt(key);
-                    JsonNode element = node.get(keyInt);
-                    if (element == null)
-                        return null;
-                    else
-                        return getNode(node.get(keyInt), path, ++index);
-                } else if (node.isObject()) {
-                    if (node.has(key)) {
-                        return getNode(node.get(key), path, ++index);
-                    }
-                    return null;
-                } else {
-                    return node;
-                }
-            }
-
-            private int arrayIndex(String string, int max, List<String> path) {
-                int index = Integer.parseInt(string);
-                if (index < 0 || index > max) {
-                    throw new JsonPatchException(
-                            "index out of bounds (path: " + JsonPathHelper.toString(path) + " | index: " + index
-                                    + " | bounds: 0-" + max + ")");
-                }
-                return index;
-            }
-        }
-
-        public abstract JsonNode add(List<String> path, JsonNode value);
-
-        public abstract JsonNode test(List<String> path, JsonNode value);
-
-        public abstract JsonNode replace(List<String> path, JsonNode value);
-
-        public abstract JsonNode remove(List<String> path);
-
-        public abstract JsonNode move(List<String> fromPath, List<String> toPath);
-
-        public abstract JsonNode copy(List<String> fromPath, List<String> toPath);
-
-        public abstract JsonNode result();
+        return new Generator.Lcs.Iterate(flags);
     }
 
     /**
-     * Static methods used for patch access and failure handling.
+     * Create JSON Patch document from given source JSON document and given target JSON document using the default set
+     * of feature flags.
+     * 
+     * @param source source JSON document.
+     * @param target target JSON document.
+     * 
+     * @return JSON Patch document.
      */
-    private static final class Helper {
-
-        public static JsonNode getPatchAttr(JsonNode node, String attr) {
-            JsonNode child = node.get(attr);
-            if (child == null) {
-                throw new JsonPatchException("invalid patch (missing field: " + attr + ")");
-            }
-            return child;
-        }
-
-        public static JsonNode getPatchAttrWithDefault(JsonNode node, String attr, JsonNode defaultValue) {
-            JsonNode child = node.get(attr);
-            return (child == null) ? defaultValue : child;
-        }
-
-        public static String getErrorMessage(Exception except, JsonNode patch, int index) {
-            return "[" + getPatchAttr(patch, Constants.OP).asText() + "] "
-                    + except.getMessage() + "\n\t\t => applying patch/" + index + ": " + patch;
-        }
-
-        public static void rethrowExceptions(List<JsonPatchException> excepts) {
-            switch (excepts.size()) {
-                case 0:
-                    return;
-
-                case 1:
-                    throw excepts.get(0);
-
-                default:
-                    StringBuilder message = new StringBuilder("invalid patch\n");
-                    for (Exception suppressed : excepts) {
-                        message.append('\t').append(suppressed.getMessage());
-                    }
-                    JsonPatchException except = new JsonPatchException(message.toString());
-                    /* Java 1.7 extension for (Exception suppressed : excepts) { except.addSuppressed(suppressed); } */
-                    throw except;
-            }
-        }
+    public static JsonNode create(final JsonNode source, final JsonNode target) {
+        return create(source, target, DEFAULT);
     }
 
-    private JsonPatch(Set<FeatureFlags> flags) {
-        this.flags = flags;
+    /**
+     * Create JSON Patch document from given source JSON document and given target JSON document using given set of
+     * feature flags.
+     * 
+     * @param source source JSON document.
+     * @param target target JSON document.
+     * @param flags set of feature flags.
+     * 
+     * @return JSON Patch document.
+     */
+    public static JsonNode create(final JsonNode source, final JsonNode target, final Set<FeatureFlags> flags) {
+        List<Patch> patches = create(flags).generate(source, target);
+        if (flags.contains(PATCH_OPTIMIZATION)) {
+            new Compactor(flags).compact(patches);
+        }
+        return convert(patches, flags);
     }
 
-    private JsonNode value(JsonNode node) {
-        if (!flags.contains(FeatureFlags.MISSING_VALUES_AS_NULLS)) {
-            return Helper.getPatchAttr(node, Constants.VALUE);
-        } else {
-            return Helper.getPatchAttrWithDefault(node, Constants.VALUE, NullNode.getInstance());
+    /**
+     * Convert given list of patches into JSON Patch document using given feature set of flags.
+     * 
+     * @param patches list of patch operation entries.
+     * @param flags set of feature flags.
+     * 
+     * @return JSON Patch document.
+     */
+    private static JsonNode convert(List<Patch> patches, Set<FeatureFlags> flags) {
+        JsonNodeFactory factory = JsonNodeFactory.instance;
+        final ArrayNode node = factory.arrayNode();
+        for (Patch patch : patches) {
+            convert(node, patch, flags);
         }
+        return node;
     }
 
-    private void patch(Processor processor, JsonNode patch) {
-        JsonPatchOpType operation = JsonPatchOpType.fromRfcName(Helper.getPatchAttr(patch, Constants.OP).asText());
-        List<String> path = JsonPathHelper.getPath(Helper.getPatchAttr(patch, Constants.PATH).asText());
+    /**
+     * Convert single patch operation entry using given set of feature flags into a JSON Patch fragment added to the
+     * given root node.
+     * 
+     * @param root JSON Patch document root node.
+     * @param patch patch operation entry.
+     * @param flags set of feature flags.
+     */
+    private static void convert(ArrayNode root, Patch patch, Set<FeatureFlags> flags) {
+        ObjectNode node = root.addObject();
+        node.put(OP, patch.type.getName());
+        node.put(PATH, PathHelper.getPathRep(patch.path));
 
-        switch (operation) {
-            case ADD: {
-                JsonNode value = value(patch);
-                processor.add(path, value);
-                break;
-            }
-
-            case TEST: {
-                JsonNode value = value(patch);
-                processor.test(path, value);
-                break;
-            }
-
-            case REPLACE: {
-                JsonNode value = value(patch);
-                processor.replace(path, value);
-                break;
-            }
-
-            case REMOVE: {
-                processor.remove(path);
-                break;
-            }
-
-            case MOVE: {
-                List<String> fromPath =
-                        JsonPathHelper.getPath(Helper.getPatchAttr(patch, Constants.FROM).asText());
-                processor.move(fromPath, path);
-                break;
-            }
-
-            case COPY: {
-                List<String> fromPath =
-                        JsonPathHelper.getPath(Helper.getPatchAttr(patch, Constants.FROM).asText());
-                processor.copy(fromPath, path);
-                break;
+        if (MOVE.equals(patch.type)) {
+            node.put(FROM, PathHelper.getPathRep(patch.path));
+            node.put(PATH, PathHelper.getPathRep(patch.from));
+        } else if (!REMOVE.equals(patch.type)) {
+            if (!patch.value.isNull() || !flags.contains(MISSING_VALUES_AS_NULLS)) {
+                node.set(VALUE, patch.value);
             }
         }
-    }
-
-    private List<JsonPatchException> apply(Processor processor, Iterator<JsonNode> patches) {
-        List<JsonPatchException> excepts = new ArrayList<JsonPatchException>();
-        for (int index = 0; patches.hasNext(); index++) {
-            try {
-                JsonNode patch = patches.next();
-                if (!patch.isObject()) {
-                    throw new JsonPatchException("invalid patch (patch not an object - index: " + index + ")");
-                }
-                try {
-                    patch(processor, patch);
-                } catch (JsonPatchException except) {
-                    throw new JsonPatchException(Helper.getErrorMessage(except, patch, index), except);
-                }
-            } catch (JsonPatchException except) {
-                excepts.add(except);
-            }
-        }
-        return excepts;
-    }
-
-    private JsonNode apply(Processor processor, JsonNode patch) {
-        if (!patch.isArray()) {
-            throw new JsonPatchException("invalid patch (root not an array)");
-        }
-        Helper.rethrowExceptions(apply(processor, patch.iterator()));
-        return processor.result();
     }
 
     public static void validate(JsonNode patch, Set<FeatureFlags> flags) throws JsonPatchException {
-        new JsonPatch(flags).apply(Processor.NOOP, patch);
+        new Applicator(flags).apply(NOOP, patch);
     }
 
     public static void validate(JsonNode patch) throws JsonPatchException {
         validate(patch, DEFAULT);
     }
 
-    public static JsonNode apply(JsonNode patch, JsonNode source, Set<FeatureFlags> flags)
+    public static JsonNode apply(JsonNode patch, JsonNode target, Set<FeatureFlags> flags)
             throws JsonPatchException {
-        JsonNode target = flags.contains(FeatureFlags.PATCH_IN_PLACE) ? source : source.deepCopy();
-        return new JsonPatch(flags).apply(new Processor.Apply(target), patch);
+        return new Applicator(flags).apply(new Processor.Apply(target), patch);
     }
 
-    public static JsonNode apply(JsonNode patch, JsonNode source) throws JsonPatchException {
-        return apply(patch, source, DEFAULT);
+    public static JsonNode apply(JsonNode patch, JsonNode target) throws JsonPatchException {
+        return apply(patch, target, DEFAULT);
     }
 }

@@ -3,7 +3,11 @@ package org.zalando.jsonpatch;
 /**
  * JSON Patch operation type.
  */
-enum JsonPatchOpType {
+enum OpType {
+    /**
+     * Unknown JSON Patch operation type (default/fallback).
+     */
+    UNKNOWN,
 
     /**
      * Add JSON Patch operation type.
@@ -40,13 +44,13 @@ enum JsonPatchOpType {
      */
     private final String name = this.name().toLowerCase().intern();
 
-    public static JsonPatchOpType fromRfcName(String name) throws JsonPatchException {
-        for (JsonPatchOpType type : JsonPatchOpType.values()) {
+    public static OpType fromRfcName(String name) throws JsonPatchException {
+        for (OpType type : OpType.values()) {
             if (type.name.equalsIgnoreCase(name)) {
                 return type;
             }
         }
-        throw new JsonPatchException("invalid patch (unsupported operation: " + name + ")");
+        return UNKNOWN;
     }
 
     /**

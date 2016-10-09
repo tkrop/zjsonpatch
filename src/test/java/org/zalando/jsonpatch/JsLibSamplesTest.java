@@ -1,5 +1,7 @@
 package org.zalando.jsonpatch;
 
+import org.junit.runners.Parameterized;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,8 +9,9 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.runners.Parameterized;
-import org.zalando.jsonpatch.FeatureFlags;
+import static org.zalando.jsonpatch.FeatureFlags.LCS_ITERATE_PATCH_GENERATOR;
+import static org.zalando.jsonpatch.FeatureFlags.LCS_VISIT_PATCH_GENERATOR;
+import static org.zalando.jsonpatch.FeatureFlags.SIMPLE_COMPARE_PATCH_GENERATOR;
 
 /**
  * @author ctranxuan (streamdata.io).
@@ -24,9 +27,9 @@ public class JsLibSamplesTest extends AbstractPatchTest {
     public static Collection<TestCase> data() throws IOException {
         List<TestCase> tests = new ArrayList<TestCase>();
         for (Set<FeatureFlags> flags : new Set[]{
-                EnumSet.of(FeatureFlags.LCS_VISIT_PATCH_GENERATOR),
-                EnumSet.of(FeatureFlags.LCS_ITERATE_PATCH_GENERATOR),
-                EnumSet.of(FeatureFlags.SIMPLE_COMPARE_PATCH_GENERATOR)
+                EnumSet.of(LCS_VISIT_PATCH_GENERATOR),
+                EnumSet.of(LCS_ITERATE_PATCH_GENERATOR),
+                EnumSet.of(SIMPLE_COMPARE_PATCH_GENERATOR)
         }) {
             for (TestCase test : TestCase.load("js-libs-samples")) {
                 tests.add(test.addFalgs(flags));

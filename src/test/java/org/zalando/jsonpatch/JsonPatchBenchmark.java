@@ -13,9 +13,10 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
-import org.zalando.jsonpatch.FeatureFlags;
-import org.zalando.jsonpatch.JsonDiff;
-import org.zalando.jsonpatch.JsonPatch;
+import static org.zalando.jsonpatch.FeatureFlags.LCS_ITERATE_PATCH_GENERATOR;
+import static org.zalando.jsonpatch.FeatureFlags.LCS_VISIT_PATCH_GENERATOR;
+import static org.zalando.jsonpatch.FeatureFlags.PATCH_OPTIMIZATION;
+import static org.zalando.jsonpatch.FeatureFlags.SIMPLE_COMPARE_PATCH_GENERATOR;
 
 public class JsonPatchBenchmark {
     private static final int SOURCE_ITEMS = 2;
@@ -34,13 +35,14 @@ public class JsonPatchBenchmark {
     private static final int RUNS = 20;
     private static final int LOOPS = 40;
     private static final Set<FeatureFlags> FLAGS = //
-            EnumSet.of(FeatureFlags.LCS_ITERATE_PATCH_GENERATOR);
+            EnumSet.of(LCS_ITERATE_PATCH_GENERATOR);
 
     @SuppressWarnings("unchecked")
     private static final Set<FeatureFlags>[] FLAGS_SET = new Set[] {
-            EnumSet.of(FeatureFlags.LCS_VISIT_PATCH_GENERATOR, FeatureFlags.PATCH_OPTIMIZATION),
-            EnumSet.of(FeatureFlags.LCS_ITERATE_PATCH_GENERATOR, FeatureFlags.PATCH_OPTIMIZATION),
-            EnumSet.of(FeatureFlags.SIMPLE_COMPARE_PATCH_GENERATOR, FeatureFlags.PATCH_OPTIMIZATION)
+            EnumSet.of(LCS_VISIT_PATCH_GENERATOR, PATCH_OPTIMIZATION),
+            EnumSet.of(LCS_VISIT_PATCH_GENERATOR),
+            EnumSet.of(LCS_ITERATE_PATCH_GENERATOR),
+            EnumSet.of(SIMPLE_COMPARE_PATCH_GENERATOR)
     };
 
     private static final String[] TOUR_PROPS =
@@ -105,7 +107,7 @@ public class JsonPatchBenchmark {
     }
 
     private static List<JsonNode> createJsonPatchList(JsonNode source, JsonNode target, Set<FeatureFlags> flags) {
-        JsonNode patch = JsonDiff.asJson(source, target, flags);
+        JsonNode patch = JsonPatch.create(source, target, flags);
         List<JsonNode> list = new ArrayList<JsonNode>(patch.size());
         Iterator<JsonNode> iter = patch.iterator();
         while (iter.hasNext()) {

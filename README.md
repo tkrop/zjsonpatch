@@ -1,90 +1,63 @@
-# This is an implementation of  [RFC 6902 JSON Patch](http://tools.ietf.org/html/rfc6902) written in Java.
+# Java JSON Patch library
 
-##Description & Use-Cases
-- Java Library to find / apply JSON Patches according to RFC 6902.
-- JSON Patch defines a JSON document structure for representing changes to a JSON document.
-- It can be used to avoid sending a whole document when only a part has changed, thus reducing network bandwidth requirements if data (in json format) is required to send across multiple systems over network or in case of multi DC transfer.
-- When used in combination with the HTTP PATCH method as per [RFC 5789 HTTP PATCH](http://tools.ietf.org/html/rfc5789), it will do partial updates for HTTP APIs in a standard  way.
+Java JSON Patch library to create and apply JSON patches according to [RFC 6902](http://tools.ietf.org/html/rfc6902), based on Jackson 2.x JSON nodes.
 
+A JSON Patch is defined by a JSON array describing the changes to a JSON document. It can be used to avoid sending a whole document when only a part has changed. It can be used to reduce the network bandwidth requirements, if the patch is smaller than the original resource. In addition, it may be used to concurrently apply none interfering patches on resources.
 
-###Compatible with : Java 6 / 7 / 8
+A JSON Patch is supposed to be combined with the HTTP PATCH method as defined in [RFC 5789 HTTP PATCH](http://tools.ietf.org/html/rfc5789). It will do the partial updates for HTTP APIs in a standard  way.
 
-##Code Coverage
-Package      |	Class, % 	 |  Method, % 	   |  Line, %           |
--------------|---------------|-----------------|--------------------|
-all classes  |	100% (6/ 6)  |	93.6% (44/ 47) |  96.2% (332/ 345)  |
+## Installation
 
-##Complexity
-- To find JsonPatch : Ω(N+M) ,N and M represents number of keys in first and second json respectively / O(summation of la*lb) where la , lb represents jsonArray of length la / lb of against same key in first and second json ,since LCS is used to find difference between 2 json arrays there of order of quadratic.
-- To Optimize Diffs ( compact move and remove into Move ) : Ω(D) / O(D*D) where D represents number of diffs obtained before compaction into Move operation.
-- To Apply Diff : O(D) where D represents number of diffs
-
-### How to use:
-
-###Current Version : 0.2.4
-
-Add following to `<dependencies/>` section of your pom.xml -
+The Java JSON Patch library is available on the Maven Cental repository. Add following to `<dependencies/>` section of your pom.xml:
 
 ```xml
-<groupId>com.flipkart.zjsonpatch</groupId>
-<artifactId>zjsonpatch</artifactId>
-<version>{version}</version>
-```
-- Avaibale on maven cental repository 
-- Available on Clojars repository, access by adding following to your `<repositories/>` section of pom.xml -
-```xml
-<repository>
-  <id>clojars</id>
-  <name>Clojars repository</name>
-  <url>https://clojars.org/repo</url>
-</repository>
-```
-[![Clojars Project](http://clojars.org/com.flipkart.zjsonpatch/zjsonpatch/latest-version.svg)](http://clojars.org/com.flipkart.zjsonpatch/zjsonpatch)
-
-
-## API Usage
-
-### Obtaining Json Diff as patch
-```xml
-JsonNode patch = JsonDiff.asJson(JsonNode source, JsonNode target)
-```
-Computes and returns a JSON Patch from source  to target,
-Both source and target must be either valid JSON objects or  arrays or values. 
-Further, if resultant patch is applied to source, it will yield target.
-
-The algorithm which computes this JsonPatch currently generates following operations as per rfc 6902 - 
- - ADD
- - REMOVE
- - REPLACE
- - MOVE
- 
-
-### Apply Json Patch
-```xml
-JsonNode target = JsonPatch.apply(JsonNode patch, JsonNode source);
-```
-Given a Patch, it apply it to source Json and return a target json which can be ( json object or array or value ). This operation  performed on a clone of source json ( thus, source json is untouched and can be used further). 
-
-### Example
-First Json
-```json
-{"a": 0,"b": [1,2]}
+<groupId>com.zalando.jsonpatch</groupId>
+<artifactId>json-patch</artifactId>
+<version>0.1.0</version>
 ```
 
-Second json ( the json to obtain )
-```json
- {"b": [1,2,0]}
+**Note:** compatible with **Java 6, 7, and 8**
+
+## Usage
+
+### Patch Creation
+
+Patches are created by the following method, that compute the patch from a given JSON source node and JSON target node:
+
+```java
+JsonNode patch = JsonPatch.create(source, target)
 ```
-Following patch will be returned:
-```json
-[{"op":"MOVE","from":"/a","path":"/b/2","value":0}]
+
+The source and target nodes can be any kind of JSON nodes, i.e. objects, arrays, strings, booleans, numbers, and null values. If the resulting patch is applied to source, it will yield target.
+
+The algorithm computing the JSON patch creates ADD, REMOVE, REPLACE, and MOVE operations, if the patch optimization is activated.
+
+### Patch Application
+
+Patches are applied by the following request, that applies the patch to a target node and returning it:
+
+```java
+JsonNode target = JsonPatch.apply(patch, target);
 ```
-here o represents Operation, p represent fromPath from where value should be moved, tp represents toPath where value should be moved and v represents value to move.
+
+The target node can be any kind of JSON node, i.e. objects, arrays, strings, booleans, numbers, and null values, while the patch must be an array of object describing the patch operations. If the target node is needed after application, it must be copied up-front.
 
 
-### Tests:
-1. 100+ selective hardcoded different input jsons , with their driver test classes present under /test directory.
-2. Apart from selective input, a deterministic random json generator is present under ( TestDataGenerator.java ),  and its driver test class method is JsonDiffTest.testGeneratedJsonDiff().
+## Performance Considerations
 
+This JSON patch library is based on the very good [zjsonpatch](https://github.com/flipkart-incubator/zjsonpatch). Compared to it, it contains a number of considerable performance improvements, as reducing the problem size for the longest common sequence (LCS) algorithm, which improves the speed for our use case by a factor of **4** for patch creation. This can be improved to an factor of **8** by using the simplified compare patch generator without patch optimization which works perfect for structural stable documents.
 
+## Complexity
 
+### Patch Creation
+- Creating patches of JSON objects has complexity of `Ω(N+M)`, where `N` and `M` represents number of keys in the source and the target JSON object.
+- Creating patches of JSON arrays has complexity of `O(la*lb)`, where `la` and `lb` represent length of the source and the target array. Since a longest common sequence (LCS) algorithm is used to find difference between two JSON arrays the complexity is of worst case quadratic order. In practical use cases the complexity is reduced by linearly reducing the problem size.
+- Optimizing patches, i.e. compact add and remove into move operations has complexity of `Ω(D)/O(D*D)`, where D represents the number of patch operations obtained before compaction.
+
+### Patch Application
+Application of patches has complexity of O(D), where D represents number of patch operations.
+
+## Code Coverage
+| Class %      | Method %       | Lines %        | Branches %      | Instructions %    |
+|--------------|----------------|----------------|-----------------|-------------------|
+| 100% (18/18) | 98.0% (98/100) | 100% (489/489) | 99.0% (208/210) | 99.6% (2335/2345) |
