@@ -16,7 +16,6 @@
     <url>https://github.com/tkrop/zjsonpatch/</url>
 
     <scm>
-        <tag>HEAD</tag>
         <connection>scm:git:https://github.com/tkrop/zjsonpatch.git</connection>
         <developerConnection>scm:git:https://github.com/tkrop/zjsonpath.git</developerConnection>
         <url>https://github.com/tkrop/zjsonpatch</url>
