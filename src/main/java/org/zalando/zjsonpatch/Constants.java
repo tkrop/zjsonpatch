@@ -1,4 +1,4 @@
-package org.zalando.jsonpatch;
+package org.zalando.zjsonpatch;
 
 /**
  * Field names of JSON Patch attributes.

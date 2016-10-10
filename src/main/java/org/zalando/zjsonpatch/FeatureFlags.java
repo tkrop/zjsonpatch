@@ -1,4 +1,4 @@
-package org.zalando.jsonpatch;
+package org.zalando.zjsonpatch;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

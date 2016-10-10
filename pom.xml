@@ -6,8 +6,8 @@
         <maven>3.0.4</maven>
     </prerequisites>
 
-    <groupId>org.zalando.jsonpatch</groupId>
-    <artifactId>json-patch</artifactId>
+    <groupId>org.zalando</groupId>
+    <artifactId>zjsonpatch</artifactId>
     <version>0.1.0</version>
     <packaging>jar</packaging>
 
@@ -17,12 +17,17 @@
 
     <scm>
         <tag>HEAD</tag>
-        <connection>scm:git:https://github.com/zalando/json-patch.git</connection>
-        <developerConnection>scm:git:https://github.com/zalando/json-path.git</developerConnection>
+        <connection>scm:git:https://github.com/zalando-in/jsonpatch.git</connection>
+        <developerConnection>scm:git:https://github.com/zalando/jsonpath.git</developerConnection>
         <url>https://github.com/zalando/json-patch</url>
     </scm>
 
     <developers>
+        <developer>
+            <id>vishwakarma</id>
+            <name>Gopi Vishwakarma</name>
+            <email>vishwakarma.iiita@gmail.com</email>
+        </developer>
         <developer>
             <id>tkrop</id>
             <name>Tronje Krop</name>
@@ -32,8 +37,8 @@
 
     <licenses>
         <license>
-            <name>MIT License</name>
-            <url>https://opensource.org/licenses/MIT</url>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>

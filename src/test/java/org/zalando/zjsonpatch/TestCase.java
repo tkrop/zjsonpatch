@@ -1,9 +1,10 @@
-package org.zalando.jsonpatch;
+package org.zalando.zjsonpatch;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.zalando.zjsonpatch.FeatureFlags;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,8 +15,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
-
-import org.zalando.jsonpatch.FeatureFlags;
 
 public class TestCase {
 

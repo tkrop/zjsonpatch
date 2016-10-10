@@ -1,4 +1,4 @@
-package org.zalando.jsonpatch;
+package org.zalando.zjsonpatch;
 
 import java.util.ArrayList;
 import java.util.List;

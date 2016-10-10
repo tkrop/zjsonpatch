@@ -1,4 +1,4 @@
-package org.zalando.jsonpatch;
+package org.zalando.zjsonpatch;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
@@ -8,11 +8,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import static org.zalando.jsonpatch.Constants.FROM;
-import static org.zalando.jsonpatch.Constants.OP;
-import static org.zalando.jsonpatch.Constants.PATH;
-import static org.zalando.jsonpatch.Constants.VALUE;
-import static org.zalando.jsonpatch.FeatureFlags.MISSING_VALUES_AS_NULLS;
+import static org.zalando.zjsonpatch.Constants.FROM;
+import static org.zalando.zjsonpatch.Constants.OP;
+import static org.zalando.zjsonpatch.Constants.PATH;
+import static org.zalando.zjsonpatch.Constants.VALUE;
+import static org.zalando.zjsonpatch.FeatureFlags.MISSING_VALUES_AS_NULLS;
 
 public final class Applicator {
 

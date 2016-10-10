@@ -1,4 +1,4 @@
-package org.zalando.jsonpatch;
+package org.zalando.zjsonpatch;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
@@ -16,9 +16,9 @@ import java.util.Set;
 
 import static com.fasterxml.jackson.databind.node.JsonNodeType.ARRAY;
 import static com.fasterxml.jackson.databind.node.JsonNodeType.OBJECT;
-import static org.zalando.jsonpatch.OpType.ADD;
-import static org.zalando.jsonpatch.OpType.REMOVE;
-import static org.zalando.jsonpatch.OpType.REPLACE;
+import static org.zalando.zjsonpatch.OpType.ADD;
+import static org.zalando.zjsonpatch.OpType.REMOVE;
+import static org.zalando.zjsonpatch.OpType.REPLACE;
 
 /**
  * Abstract patch generator.

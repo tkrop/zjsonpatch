@@ -1,10 +1,12 @@
-package org.zalando.jsonpatch;
+package org.zalando.zjsonpatch;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
+import org.zalando.zjsonpatch.FeatureFlags;
+import org.zalando.zjsonpatch.JsonPatch;
 
 import java.util.Set;
 

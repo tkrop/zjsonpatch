@@ -1,4 +1,4 @@
-package org.zalando.jsonpatch;
+package org.zalando.zjsonpatch;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -9,18 +9,18 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.zalando.jsonpatch.Constants.FROM;
-import static org.zalando.jsonpatch.Constants.OP;
-import static org.zalando.jsonpatch.Constants.PATH;
-import static org.zalando.jsonpatch.Constants.VALUE;
-import static org.zalando.jsonpatch.FeatureFlags.LCS_ITERATE_PATCH_GENERATOR;
-import static org.zalando.jsonpatch.FeatureFlags.LCS_VISIT_PATCH_GENERATOR;
-import static org.zalando.jsonpatch.FeatureFlags.MISSING_VALUES_AS_NULLS;
-import static org.zalando.jsonpatch.FeatureFlags.PATCH_OPTIMIZATION;
-import static org.zalando.jsonpatch.FeatureFlags.SIMPLE_COMPARE_PATCH_GENERATOR;
-import static org.zalando.jsonpatch.OpType.MOVE;
-import static org.zalando.jsonpatch.OpType.REMOVE;
-import static org.zalando.jsonpatch.Processor.NOOP;
+import static org.zalando.zjsonpatch.Constants.FROM;
+import static org.zalando.zjsonpatch.Constants.OP;
+import static org.zalando.zjsonpatch.Constants.PATH;
+import static org.zalando.zjsonpatch.Constants.VALUE;
+import static org.zalando.zjsonpatch.FeatureFlags.LCS_ITERATE_PATCH_GENERATOR;
+import static org.zalando.zjsonpatch.FeatureFlags.LCS_VISIT_PATCH_GENERATOR;
+import static org.zalando.zjsonpatch.FeatureFlags.MISSING_VALUES_AS_NULLS;
+import static org.zalando.zjsonpatch.FeatureFlags.PATCH_OPTIMIZATION;
+import static org.zalando.zjsonpatch.FeatureFlags.SIMPLE_COMPARE_PATCH_GENERATOR;
+import static org.zalando.zjsonpatch.OpType.MOVE;
+import static org.zalando.zjsonpatch.OpType.REMOVE;
+import static org.zalando.zjsonpatch.Processor.NOOP;
 
 /**
  * Entry point to create and apply a JSON Patches from given source and target JSON nodes. The {@link FeatureFlags} can

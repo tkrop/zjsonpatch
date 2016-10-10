@@ -1,10 +1,13 @@
-package org.zalando.jsonpatch;
+package org.zalando.zjsonpatch;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.zalando.zjsonpatch.Constants;
+import org.zalando.zjsonpatch.JsonPatch;
+import org.zalando.zjsonpatch.PathHelper;
 
 public class CoverageTest {
     @Test

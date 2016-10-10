@@ -1,9 +1,11 @@
-package org.zalando.jsonpatch;
+package org.zalando.zjsonpatch;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.zalando.zjsonpatch.FeatureFlags;
+import org.zalando.zjsonpatch.JsonPatch;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -13,10 +15,10 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.zalando.jsonpatch.FeatureFlags.LCS_ITERATE_PATCH_GENERATOR;
-import static org.zalando.jsonpatch.FeatureFlags.LCS_VISIT_PATCH_GENERATOR;
-import static org.zalando.jsonpatch.FeatureFlags.PATCH_OPTIMIZATION;
-import static org.zalando.jsonpatch.FeatureFlags.SIMPLE_COMPARE_PATCH_GENERATOR;
+import static org.zalando.zjsonpatch.FeatureFlags.LCS_ITERATE_PATCH_GENERATOR;
+import static org.zalando.zjsonpatch.FeatureFlags.LCS_VISIT_PATCH_GENERATOR;
+import static org.zalando.zjsonpatch.FeatureFlags.PATCH_OPTIMIZATION;
+import static org.zalando.zjsonpatch.FeatureFlags.SIMPLE_COMPARE_PATCH_GENERATOR;
 
 public class JsonPatchBenchmark {
     private static final int SOURCE_ITEMS = 2;

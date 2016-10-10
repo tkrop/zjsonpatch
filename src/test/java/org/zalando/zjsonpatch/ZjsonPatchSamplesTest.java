@@ -1,6 +1,7 @@
-package org.zalando.jsonpatch;
+package org.zalando.zjsonpatch;
 
 import org.junit.runners.Parameterized;
+import org.zalando.zjsonpatch.FeatureFlags;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,10 +10,10 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.zalando.jsonpatch.FeatureFlags.LCS_ITERATE_PATCH_GENERATOR;
-import static org.zalando.jsonpatch.FeatureFlags.LCS_VISIT_PATCH_GENERATOR;
-import static org.zalando.jsonpatch.FeatureFlags.PATCH_OPTIMIZATION;
-import static org.zalando.jsonpatch.FeatureFlags.SIMPLE_COMPARE_PATCH_GENERATOR;
+import static org.zalando.zjsonpatch.FeatureFlags.LCS_ITERATE_PATCH_GENERATOR;
+import static org.zalando.zjsonpatch.FeatureFlags.LCS_VISIT_PATCH_GENERATOR;
+import static org.zalando.zjsonpatch.FeatureFlags.PATCH_OPTIMIZATION;
+import static org.zalando.zjsonpatch.FeatureFlags.SIMPLE_COMPARE_PATCH_GENERATOR;
 
 /**
  * JSON Patch test.

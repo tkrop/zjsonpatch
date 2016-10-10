@@ -1,12 +1,12 @@
-package org.zalando.jsonpatch;
+package org.zalando.zjsonpatch;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static org.zalando.jsonpatch.OpType.ADD;
-import static org.zalando.jsonpatch.OpType.MOVE;
-import static org.zalando.jsonpatch.OpType.REMOVE;
+import static org.zalando.zjsonpatch.OpType.ADD;
+import static org.zalando.zjsonpatch.OpType.MOVE;
+import static org.zalando.zjsonpatch.OpType.REMOVE;
 
 /**
  * Merging remove and add to a single move operation.
