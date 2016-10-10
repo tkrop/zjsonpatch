@@ -11,15 +11,15 @@
     <version>0.1.0</version>
     <packaging>jar</packaging>
 
-    <name>json-patch</name>
+    <name>zjsonpatch</name>
     <description>Java library to find / apply JSON patches</description>
     <url>https://github.com/tkrop/zjsonpatch/</url>
 
     <scm>
         <tag>HEAD</tag>
-        <connection>scm:git:https://github.com/zalando-in/jsonpatch.git</connection>
-        <developerConnection>scm:git:https://github.com/zalando/jsonpath.git</developerConnection>
-        <url>https://github.com/zalando/json-patch</url>
+        <connection>scm:git:https://github.com/tkrop/zjsonpatch.git</connection>
+        <developerConnection>scm:git:https://github.com/tkrop/zjsonpath.git</developerConnection>
+        <url>https://github.com/tkrop/zjsonpatch</url>
     </scm>
 
     <developers>
@@ -156,7 +156,7 @@
 
     <profiles>
         <profile>
-            <id>release</id>
+            <id>install</id>
             <build>
                 <plugins>
                     <plugin>
@@ -186,7 +186,14 @@
                             </execution>
                         </executions>
                     </plugin>
+                </plugins>
+            </build>
+        </profile>
 
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
